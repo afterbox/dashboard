@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Wordmark } from "@/components/ui/Wordmark";
+import { pageMetadata } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "Who will you build it for? · afterbox",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Who will you build it for?",
+  description:
+    "Start building afterbox for someone you love: what they'll need to find, and what you want them to hear, one small piece at a time.",
+  path: "/start",
+});
 
 // PLACEHOLDER until onboarding exists. Its first question is the one onboarding will open with.
 export default function Start() {

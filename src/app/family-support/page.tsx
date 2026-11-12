@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { PlainPage } from "@/components/ui/PlainPage";
+import { pageMetadata } from "@/lib/site";
 import { trustLines } from "@/lib/trust-lines";
 
-export const metadata: Metadata = {
-  title: "Family support · afterbox",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Family support",
+  description:
+    "Just lost someone? afterbox helps your family find what they had and settle it, one step at a time, even if they never used afterbox.",
+  path: "/family-support",
+});
 
 // PLACEHOLDER until family support exists. Still mode: care first, no cast, nothing sold.
 export default function FamilySupport() {

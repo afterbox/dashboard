@@ -8,8 +8,9 @@ import "./families/families.css";
 /**
  * What a family asks in the first weeks, and the first step afterbox gives.
  * Steps, never advice: where to start, who to tell, where to look.
+ * The structured data repeats them, word for word (src/lib/structured-data.ts).
  */
-const asked = [
+export const asked = [
   {
     question: "Where do I find Dad's pension?",
     answer: "Start here. We'll help you trace it in three steps.",

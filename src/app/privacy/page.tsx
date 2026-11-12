@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import { PlainPage } from "@/components/ui/PlainPage";
+import { pageMetadata } from "@/lib/site";
 import { promises } from "@/lib/trust-lines";
 
-export const metadata: Metadata = {
-  title: "Privacy · afterbox",
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy",
+  description:
+    "How afterbox looks after what you keep for the people you love. Not even afterbox can open your vault. We never sell your data.",
+  path: "/privacy",
+});
 
 // PLACEHOLDER until the privacy notice is written. The promises are the trust lines, word for word.
 export default function Privacy() {

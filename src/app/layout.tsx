@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Figtree, Fraunces } from "next/font/google";
 import { StartAtTop } from "@/components/StartAtTop";
+import { pageMetadata, site } from "@/lib/site";
 import "./globals.css";
 
 // Display: Fraunces (variable), with the SOFT and optical-size axes.
@@ -26,10 +27,24 @@ const caveat = Caveat({
   display: "swap",
 });
 
+// Every page starts from this and replaces only what it says about itself (src/lib/site.ts).
 export const metadata: Metadata = {
-  title: "afterbox — build their gift, so they won't have to guess",
-  description:
-    "Everything the people you love most will need to find, and everything you want them to hear. Gathered as your life grows, and given to them when the time comes.",
+  ...pageMetadata({ description: site.description, path: "/" }),
+  metadataBase: new URL(site.url),
+  title: { default: site.title, template: `%s · ${site.name}` },
+  applicationName: site.name,
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  category: "Personal finance and family planning",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+  },
+  // Stops phones turning numbers in the copy (£38.50, 0:42) into phone links.
+  formatDetection: { telephone: false, address: false, email: false },
+  appleWebApp: { title: site.name },
 };
 
 // Status bar / browser chrome matches the page ground in both themes.

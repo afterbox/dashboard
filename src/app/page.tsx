@@ -11,11 +11,14 @@ import { SayIt } from "@/components/sections/SayIt";
 import { Sealed } from "@/components/sections/Sealed";
 import { StillMode } from "@/components/sections/still/StillMode";
 import { WhenTheTimeComes } from "@/components/sections/WhenTheTimeComes";
+import { asJsonLd, landingPageData } from "@/lib/structured-data";
 
 // The landing page: one story, in the order of docs/landing-page-story.md.
 export default function Home() {
   return (
     <>
+      {/* What this page is, for search engines. A plain script tag: it is data, not code. */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: asJsonLd(landingPageData) }} />
       <Nav />
       <main>
         <Hero />
