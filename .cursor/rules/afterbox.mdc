@@ -1,0 +1,6 @@
+---
+description: afterbox brand, design system and product context
+alwaysApply: true
+---
+
+Follow CLAUDE.md in the project root. It summarises the product, the non-negotiable brand rules and how the design tokens map to Tailwind utilities. Read docs/design-system.md before building or changing UI, use the token utilities from src/app/globals.css, and never hard-code colours or font sizes.

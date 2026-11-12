@@ -1,0 +1,159 @@
+/*
+  The hero's final frame (rings, box, note): how big it is and where it sits,
+  so it never goes under the nav and never touches the words.
+
+  It sets four things the frame's pieces read:
+    --s        its size (1 is full size). Rings, box and note scale by it.
+    --n        the note's size on top of that. The note is words, so it is as
+               wide on a small phone as on a desktop while the rings are not;
+               where it would be wider than the space, it alone shrinks more.
+    --dx --dy  how far it moves from the zoom's centre point to make room.
+    --stroke   the ring line, held at 1.75px on screen whatever the size.
+
+  Lengths are measured against the `screen` container in HeroScene (cqw, cqh:
+  the screen with the browser's toolbars showing). A size is one length divided
+  by another, which CSS writes as tan(atan2(a, b)).
+
+  Art units: landscape is 1600 x 900, centre 68% across and 50% down, outer
+  ring radius 370. Portrait is 900 x 1600, centre 50% across and 36% down,
+  outer ring radius 450. See timeline.ts and Rings.tsx; keep them in step.
+*/
+
+.hero-final-frame {
+  --nav: calc(var(--spacing) * 16);
+  --gap: calc(var(--spacing) * 2);
+  --top: calc(var(--nav) + var(--gap));
+  --s: 1;
+  --n: 1;
+  --dx: 0px;
+  --dy: 0px;
+  translate: var(--dx) var(--dy);
+}
+
+@media (width >= 48rem) {
+  .hero-final-frame {
+    --nav: calc(var(--spacing) * 18);
+  }
+}
+
+/*
+  Landscape, with room: the frame stays on the zoom's centre and only shrinks,
+  enough for the outer ring to clear the nav above and the screen's edge below.
+*/
+@media (orientation: landscape) {
+  .hero-final-frame {
+    --art-h: max(100lvh, 56.25cqw);
+    --art-w: max(100cqw, 177.78lvh);
+    --ring: calc(var(--art-h) * 0.4111);
+    --bottom: calc(100cqh - var(--gap));
+    --s: min(1, tan(atan2(min(50lvh - var(--top), var(--bottom) - 50lvh), var(--ring))));
+    --stroke: calc(1px * tan(atan2(1575px, var(--art-h))) / var(--s));
+  }
+}
+
+/*
+  A phone held sideways. The words take a fixed column on the left; the frame
+  gets the space that is left (right of the column, under the nav), fits
+  inside it and sits in its middle.
+*/
+@container screen (height < 600px) {
+  @media (orientation: landscape) {
+    .hero-final-frame {
+      /* The page grid is 300 wide at most; on wider screens it sits in from the edges. */
+      --inset: max(0px, (100cqw - var(--spacing) * 300) / 2);
+      /* Side margin, the column, a gap. HeroCopy sets the same column width. */
+      --left: calc(var(--inset) + var(--spacing) * (5 + 76 + 4));
+      --right: calc(100cqw - var(--inset) - var(--spacing) * 5);
+      --half-w: calc((var(--right) - var(--left)) / 2);
+      --half-h: calc((var(--bottom) - var(--top)) / 2);
+      --s: min(
+        1,
+        tan(atan2(var(--half-w), var(--ring))),
+        tan(atan2(var(--half-h), var(--ring)))
+      );
+      /* Half the note's width, and how far right of the centre it hangs. Under md it breaks onto four lines, which is narrower. */
+      --note: 9.5rem;
+      --note-fit: tan(atan2(var(--half-w), (var(--note) + var(--art-w) * 0.019) * var(--s)));
+      /*
+        Shrink the note to fit the space, and to sit inside the rings rather
+        than over them. If fitting it would leave the handwriting under about
+        13px (half size), it can't be read, so it is left out: the last term
+        is 1 above that size and 0 below it.
+      */
+      --n: calc(
+        min(1, var(--note-fit), tan(atan2(var(--ring) * 0.85, var(--note)))) *
+          clamp(0, (var(--note-fit) * var(--s) - 0.5) * 100, 1)
+      );
+      --dx: calc(var(--left) + var(--half-w) - 50cqw - var(--art-w) * 0.18);
+      --dy: calc(var(--top) + var(--half-h) - 50lvh);
+    }
+
+    @media (width >= 48rem) {
+      .hero-final-frame {
+        --left: calc(var(--inset) + var(--spacing) * (6 + 80 + 4));
+        --note: 12.5rem;
+      }
+    }
+  }
+}
+
+/*
+  Portrait: the frame sits between the nav and the words. HeroCopy measures how
+  tall the words are and sets --copy-h; until it has, a fair guess stands in.
+  The frame shrinks to fit that space, then moves up or down only as far as it
+  must to stay inside it.
+
+  The note hangs from the box by its top edge (BoxAndNote), so it reaches
+  further down than the rings do on a phone and the fit has to count it. If
+  counting it would leave the handwriting under about 13px (half size), the
+  note is left out and the rings and box take the room instead: --show is 1
+  with the note and 0 without.
+*/
+@media (orientation: portrait) {
+  .hero-final-frame {
+    --art-h: 100cqh;
+    --ring: calc(var(--art-h) * 0.28125);
+    /* Below the centre: where the rings end, */
+    --rings-end: calc(var(--art-h) * 0.209);
+    /* and the foot of the note: how far down it hangs, plus its height (four lines). */
+    --note-end: calc(var(--art-h) * 0.035 + 9.75rem);
+    --bottom: calc(100cqh - var(--copy-h, 18rem) - var(--gap));
+    --room: calc(var(--bottom) - var(--top));
+
+    --s-note: tan(atan2(var(--room), var(--ring) + max(var(--rings-end), var(--note-end))));
+    --s-bare: tan(atan2(var(--room), var(--ring) + var(--rings-end)));
+    --show: clamp(0, (var(--s-note) - 0.5) * 100, 1);
+    --s: clamp(0.3, var(--s-note) * var(--show) + var(--s-bare) * (1 - var(--show)), 1);
+    /* The note keeps inside the side margins. */
+    --n: calc(min(1, tan(atan2(100cqw - 2.5rem, 19rem * var(--s)))) * var(--show));
+
+    --below: max(var(--rings-end), var(--note-end) * var(--show));
+    --dy: clamp(
+      var(--top) + var(--ring) * var(--s) - 36cqh,
+      0px,
+      var(--bottom) - var(--below) * var(--s) - 36cqh
+    );
+    --stroke: calc(1px * tan(atan2(2800px, var(--art-h))) / var(--s));
+  }
+
+  /* From md the note is three lines, and hangs a little lower on the bigger box. */
+  @media (width >= 48rem) {
+    .hero-final-frame {
+      --note-end: calc(var(--art-h) * 0.055 + 7.75rem);
+    }
+  }
+}
+
+/*
+  Clouds: one flat shape, no outline. Paper by day, a soft keepsake tint over
+  the sky at night. Not a token: it is mixed from two tokens, for this scene
+  only. light-dark() follows the theme's `color-scheme`, set with the tokens in
+  globals.css, so it switches with them (device setting or data-theme).
+*/
+.hero-cloud {
+  stroke: none;
+  fill: light-dark(
+    var(--ab-paper),
+    color-mix(in srgb, var(--ab-keepsake) 30%, var(--ab-blush))
+  );
+}

@@ -1,0 +1,242 @@
+@import "tailwindcss";
+
+/*
+  afterbox design tokens — generated from docs/tokens.json (source of truth: the afterbox design system).
+  Themes: Daylight (light, default) and Candlelight (dark).
+  Candlelight follows the device setting, unless <html data-theme="light|dark"> forces one.
+*/
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/*
+  Not tokens: screen tiers for pinned scenes, for fitting a scene to short and small screens.
+  They read the `screen` container (see HeroScene), which is as tall as the screen
+  at its smallest, with the browser's toolbars showing. Unlike a height media
+  query, the tier never flips when a toolbar slides away mid-scroll.
+*/
+@custom-variant roomy (@container screen (width >= 375px) and (height >= 820px));
+@custom-variant tight (@container screen (height < 600px));
+@custom-variant tiny (@container screen (height < 530px));
+@custom-variant squat (@container screen (height < 360px));
+@custom-variant narrow (@container screen (width < 360px));
+
+:root {
+  color-scheme: light;
+  --ab-linen: #fbf6ef;
+  --ab-paper: #fffdfa;
+  --ab-blush: #f6dfd6;
+  --ab-line: #e9ddd3;
+  --ab-ink: #2a1b1f;
+  --ab-ink-muted: #6e5a5c;
+  --ab-heartwood: #b4432f;
+  --ab-heartwood-deep: #8e3322;
+  --ab-on-heartwood: #fff8f3;
+  --ab-keepsake: #4a2a3a;
+  --ab-lantern: #e3a64a;
+  --ab-on-lantern: #2a1b1f;
+  --ab-sage: #557052;
+  --ab-alert: #9f2a44;
+  --ab-focus: var(--ab-heartwood);
+  --ab-partner-accent: var(--ab-heartwood);
+  --ab-shadow-rest: 0 1px 2px rgba(74,42,58,0.06), 0 2px 8px rgba(74,42,58,0.05);
+  --ab-shadow-lift: 0 10px 30px rgba(74,42,58,0.10), 0 2px 6px rgba(74,42,58,0.06);
+  --ab-shadow-glow: 0 0 0 6px rgba(227,166,74,0.18);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ab-linen: #1c1416;
+  --ab-paper: #2b2023;
+  --ab-blush: #3a2529;
+  --ab-line: #4a3a3d;
+  --ab-ink: #f6ede6;
+  --ab-ink-muted: #b9a7a4;
+  --ab-heartwood: #ea8670;
+  --ab-heartwood-deep: #f3a795;
+  --ab-on-heartwood: #1c1416;
+  --ab-keepsake: #c9a3b6;
+  --ab-lantern: #e9b562;
+  --ab-on-lantern: #1c1416;
+  --ab-sage: #9db894;
+  --ab-alert: #f08aa0;
+  --ab-focus: var(--ab-heartwood);
+  --ab-partner-accent: var(--ab-heartwood);
+  --ab-shadow-rest: 0 1px 2px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25);
+  --ab-shadow-lift: 0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3);
+  --ab-shadow-glow: 0 0 0 6px rgba(233,181,98,0.16);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --ab-linen: #1c1416;
+    --ab-paper: #2b2023;
+    --ab-blush: #3a2529;
+    --ab-line: #4a3a3d;
+    --ab-ink: #f6ede6;
+    --ab-ink-muted: #b9a7a4;
+    --ab-heartwood: #ea8670;
+    --ab-heartwood-deep: #f3a795;
+    --ab-on-heartwood: #1c1416;
+    --ab-keepsake: #c9a3b6;
+    --ab-lantern: #e9b562;
+    --ab-on-lantern: #1c1416;
+    --ab-sage: #9db894;
+    --ab-alert: #f08aa0;
+    --ab-focus: var(--ab-heartwood);
+    --ab-partner-accent: var(--ab-heartwood);
+    --ab-shadow-rest: 0 1px 2px rgba(0,0,0,0.35), 0 2px 8px rgba(0,0,0,0.25);
+    --ab-shadow-lift: 0 10px 30px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3);
+    --ab-shadow-glow: 0 0 0 6px rgba(233,181,98,0.16);
+  }
+}
+
+@theme inline {
+  /* Colours: bg-linen, text-ink, bg-heartwood, text-on-heartwood, border-line ... */
+  --color-linen: var(--ab-linen);
+  --color-paper: var(--ab-paper);
+  --color-blush: var(--ab-blush);
+  --color-line: var(--ab-line);
+  --color-ink: var(--ab-ink);
+  --color-ink-muted: var(--ab-ink-muted);
+  --color-heartwood: var(--ab-heartwood);
+  --color-heartwood-deep: var(--ab-heartwood-deep);
+  --color-on-heartwood: var(--ab-on-heartwood);
+  --color-keepsake: var(--ab-keepsake);
+  --color-lantern: var(--ab-lantern);
+  --color-on-lantern: var(--ab-on-lantern);
+  --color-sage: var(--ab-sage);
+  --color-alert: var(--ab-alert);
+  --color-focus: var(--ab-focus);
+  --color-partner-accent: var(--ab-partner-accent);
+
+  /* Fonts (loaded with next/font in layout.tsx) */
+  --font-sans: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Shadows: shadow-rest, shadow-lift, shadow-glow */
+  --shadow-rest: var(--ab-shadow-rest);
+  --shadow-lift: var(--ab-shadow-lift);
+  --shadow-glow: var(--ab-shadow-glow);
+}
+
+@theme {
+  /* Radius: rounded-sm, rounded-md, rounded-lg, rounded-xl, rounded-pill */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-xl: 40px;
+  --radius-pill: 999px;
+
+  /* Type scale: text-display-xl, text-display-xl-mobile, text-body, text-eyebrow ...
+     Use the -mobile display sizes below md: e.g. "text-display-xl-mobile md:text-display-xl" */
+  --text-display-xl: 80px;
+  --text-display-xl--line-height: 84px;
+  --text-display-xl--font-weight: 380;
+  --text-display-xl--letter-spacing: -0.02em;
+  --text-display-l: 56px;
+  --text-display-l--line-height: 60px;
+  --text-display-l--font-weight: 380;
+  --text-display-l--letter-spacing: -0.015em;
+  --text-display-m: 40px;
+  --text-display-m--line-height: 46px;
+  --text-display-m--font-weight: 400;
+  --text-display-m--letter-spacing: -0.01em;
+  --text-display-s: 28px;
+  --text-display-s--line-height: 34px;
+  --text-display-s--font-weight: 420;
+  --text-display-xl-mobile: 44px;
+  --text-display-xl-mobile--line-height: 48px;
+  --text-display-xl-mobile--font-weight: 380;
+  --text-display-xl-mobile--letter-spacing: -0.02em;
+  --text-display-l-mobile: 36px;
+  --text-display-l-mobile--line-height: 40px;
+  --text-display-l-mobile--font-weight: 380;
+  --text-display-l-mobile--letter-spacing: -0.015em;
+  --text-display-m-mobile: 30px;
+  --text-display-m-mobile--line-height: 36px;
+  --text-display-m-mobile--font-weight: 400;
+  --text-display-s-mobile: 24px;
+  --text-display-s-mobile--line-height: 30px;
+  --text-display-s-mobile--font-weight: 420;
+  --text-title: 20px;
+  --text-title--line-height: 28px;
+  --text-title--font-weight: 600;
+  --text-body-l: 19px;
+  --text-body-l--line-height: 30px;
+  --text-body-l--font-weight: 400;
+  --text-body-l-mobile: 17px;
+  --text-body-l-mobile--line-height: 28px;
+  --text-body-l-mobile--font-weight: 400;
+  --text-body: 16px;
+  --text-body--line-height: 26px;
+  --text-body--font-weight: 400;
+  --text-small: 14px;
+  --text-small--line-height: 22px;
+  --text-small--font-weight: 400;
+  --text-label: 15px;
+  --text-label--line-height: 20px;
+  --text-label--font-weight: 600;
+  --text-eyebrow: 12px;
+  --text-eyebrow--line-height: 16px;
+  --text-eyebrow--font-weight: 600;
+  --text-eyebrow--letter-spacing: 0.1em;
+  --text-note: 26px;
+  --text-note--line-height: 32px;
+  --text-note--font-weight: 500;
+
+  /* Spacing: Tailwind's 4px scale already matches the design system's space-N tokens
+     (space-4 = p-4 = 16px, space-24 = p-24 = 96px). */
+
+  /* Motion */
+  --ease-gift: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-state: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-play: cubic-bezier(0.34, 1.56, 0.64, 1); /* Gift mode only: drops, reactions, nudges */
+}
+
+@layer base {
+  html {
+    background: var(--ab-linen);
+    color: var(--ab-ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    font-family: var(--font-figtree), system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 16px;
+    line-height: 26px;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ab-focus);
+    outline-offset: 2px;
+  }
+  input, select, textarea {
+    font-size: 16px; /* stops iOS zooming into fields */
+  }
+}
+
+/* Display text: Fraunces with the SOFT axis fully on. */
+@utility font-display {
+  font-family: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  font-variation-settings: "SOFT" 100;
+}
+
+/* Handwritten voice: only for the user's own words (message titles, quoted lines). */
+@utility font-note {
+  font-family: var(--font-caveat), "Bradley Hand", cursive;
+}
+
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  line-height: var(--text-eyebrow--line-height);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}

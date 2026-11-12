@@ -1,0 +1,23 @@
+## How we build (follow this every time)
+
+1. **One section at a time.** Never build the whole landing page in one pass. Plan first (plan mode), then build one section from `docs/landing-page-story.md`, then stop for review.
+2. **Read the spec, then look.** Before building a section, read its entry in the story doc and in `docs/references.md`, and look at its frames in `docs/references/`. If Claude in Chrome is connected (`/chrome`), open the reference site, scroll to the effect and screenshot it.
+3. **Check your own work in the browser.** Run the dev server, open the page at desktop width (1440px) and phone width (390px), in light and dark mode, and screenshot it. Compare against the spec before saying it's done.
+4. **Illustrations:** the real cast is being commissioned (`docs/illustrator-brief.md`). Until it arrives, use **simple placeholder shapes** (rounded blocks in palette colours, labelled) on the same layers and positions. **Never** generate detailed characters in SVG yourself; it's what makes sites look AI-made.
+
+## Avoid the "AI look" (hard rules)
+
+If any of these appear, the work is wrong:
+- Purple, blue or rainbow gradients; glowing blurred blobs; mesh gradients.
+- A grid of three (or six) identical feature cards with an icon, a bold title and two lines of text.
+- Emoji used as icons; stock icon sets dropped in without purpose.
+- Glassmorphism (frosted see-through cards), neon, heavy drop shadows.
+- Inter, Poppins or any font other than Fraunces, Figtree and Caveat.
+- Fake logo strips ("Trusted by…"), fake testimonials, fake stats, fake star ratings.
+- Every section entering the same way (all fade-up). Each section has its own motion signature from the story doc.
+- Everything centred; uniform section heights; a wall of equal-width columns.
+- Generic copy: "Revolutionize", "Seamless", "Unlock", "Empower", "All-in-one", "Next-gen". Use the voice in the design system.
+- Stock photos of people smiling at laptops.
+
+What good looks like instead: one strong idea per screen, generous space, real product moments shown working, specific human copy with names ("For Ada, on her 18th birthday"), hand-offs between sections, and motion that means something.
+
