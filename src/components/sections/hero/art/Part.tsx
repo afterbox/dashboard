@@ -39,6 +39,14 @@ type Props = {
  * paper and box follow the scroll rather than the clock:
  *   person-body · paper · box (box-papers)
  *
+ * Sections 3 and 4 share the open box (../../box/BoxSceneArt.tsx), and section 4
+ * draws Mary growing up (../../say-it/art/MaryArt.tsx). The story moves most of
+ * these; the clock only biscuit, person and wave:
+ *   box (box-lid, box-item) · envelope
+ *   biscuit (biscuit-tail, biscuit-up (biscuit-body, biscuit-head (biscuit-perk (biscuit-ear))))
+ *   mary-4 · mary-10 · mary-15 (each a person) · mary-mark
+ *   wave (wave-bar)
+ *
  * docs/illustrator-brief.md lists every name with its pivot. Keep it in step.
  */
 export function Part({ name, pivot, who, perches, className, children }: Props) {

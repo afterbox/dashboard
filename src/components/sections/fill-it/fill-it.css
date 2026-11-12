@@ -1,0 +1,79 @@
+/*
+  Section 3, "Fill it, a little at a time": where the box sits, and how big.
+
+  The box stays on screen while the four beats scroll past it.
+    Stacked (a phone or tablet held upright): the box is a strip along the
+    bottom of the screen, and the beats come up from behind it.
+    Beside (held sideways, or a wide screen): the beats on the left, the box
+    a tall panel on the right, where section 2 left it.
+
+  It sets what the layout reads:
+    --fi-nav   the height of the nav
+    --fi-art   stacked: the height of the art. The success line sits under it.
+    --fi-says  the room the success line has: two lines of it
+    --fi-h     beside: the height of the whole panel. The art and the success
+               line sit in the middle of it, together.
+    --fi-top   beside: where the panel sticks
+
+  The two media queries match the `beside` and `low` variants in globals.css.
+*/
+
+.fill-it {
+  --fi-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 16);
+  /* Never so tall that the board is wider than the screen. */
+  --fi-art: min(max(28svh, 10.5rem), 66vw);
+  --fi-says: calc(var(--spacing) * 15);
+}
+
+@media (width >= 48rem) {
+  .fill-it {
+    --fi-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 18);
+  }
+}
+
+@media (orientation: landscape), (width >= 64rem) {
+  .fill-it {
+    --fi-gap: calc(var(--spacing) * 6);
+    --fi-h: min(100svh - var(--fi-nav) - 2 * var(--fi-gap), 45rem);
+    --fi-top: calc(var(--fi-nav) + (100svh - var(--fi-nav) - var(--fi-h)) / 2);
+  }
+}
+
+@media (orientation: landscape) and (height < 600px) {
+  .fill-it {
+    --fi-gap: calc(var(--spacing) * 3);
+  }
+}
+
+/*
+  The board (400 × 280; see ../box/BoxSceneArt.tsx), placed in the space the
+  art has. Which way depends on the shape of that space, not on how the screen
+  is held.
+
+  A wide strip: the board stands on the bottom edge, as tall as the strip. The
+  rings rise over the box and are cut off below it.
+
+  A tall panel: the rings are whole. The board is sized so the outer ring
+  (radius 176) fits the panel, and placed so the middle of the box (67.5%
+  across, 70.7% down the board) sits a little right of the panel's middle,
+  leaving room for Biscuit on the left.
+*/
+.fill-board {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: min(100cqh, 70cqw);
+  aspect-ratio: 400 / 280;
+  translate: -50% 0;
+}
+
+@container fill (aspect-ratio < 1.15) {
+  .fill-board {
+    top: 50%;
+    bottom: auto;
+    left: 60%;
+    width: min(89cqw, 113cqh);
+    height: auto;
+    translate: -67.5% -70.7%;
+  }
+}

@@ -1,0 +1,66 @@
+/*
+  The open box and Biscuit (./BoxSceneArt.tsx): the parts that follow the
+  story rather than the clock. Sections 3 and 4 share it.
+
+  The scene sets two numbers and two switches on `.box-scene`:
+    --caught       how many beats have landed: one ring each
+    --items        how many things are in the box: one top showing each
+    data-ears      a card has appeared: Biscuit's ear lifts
+    data-sitting   Biscuit sits up
+
+  Every ring and item knows which one it is (--k, from 1), so each is on once
+  the count reaches it, and off again if the count drops (scrolling back up).
+
+  Reduced motion: the full box, every ring, Biscuit sitting, from the first
+  paint. The numbers are held in CSS so no script is needed for it.
+*/
+
+.box-scene {
+  --caught: 0;
+  --items: 0;
+}
+
+/* A ring grows outward from the box and settles. Gift mode: a small overshoot. */
+.box-ring {
+  --on: clamp(0, var(--caught) - var(--k) + 1, 1);
+  opacity: var(--on);
+  scale: calc(0.84 + 0.16 * var(--on));
+  transform-origin: 270px 198px;
+  transition:
+    scale 900ms var(--ease-play),
+    opacity 240ms var(--ease-state);
+}
+
+/* The top of a card comes to rest above the rim. */
+.box-item {
+  --on: clamp(0, var(--items) - var(--k) + 1, 1);
+  opacity: var(--on);
+  translate: 0 calc((1 - var(--on)) * 14px);
+  transition:
+    translate 420ms var(--ease-play),
+    opacity 160ms var(--ease-state);
+}
+
+.box-scene [data-part="biscuit-up"] {
+  transition: rotate 560ms var(--ease-play);
+}
+.box-scene[data-sitting] [data-part="biscuit-up"] {
+  rotate: -28deg;
+}
+
+.box-scene [data-part="biscuit-perk"] {
+  transition: rotate 360ms var(--ease-play);
+}
+.box-scene[data-ears] [data-part="biscuit-perk"] {
+  rotate: 112deg;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .box-scene {
+    --caught: 4 !important;
+    --items: 5 !important;
+  }
+  .box-scene [data-part="biscuit-up"] {
+    rotate: -28deg;
+  }
+}

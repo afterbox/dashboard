@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { addItShown } from "@/components/sections/fill-it/signals";
 import { heroCta, zoomStarted } from "@/components/sections/hero/signals";
 import { GiftButton } from "@/components/ui/GiftButton";
 import { Wordmark } from "@/components/ui/Wordmark";
@@ -33,7 +34,10 @@ function usePastHero(header: RefObject<HTMLElement | null>) {
 export function Nav() {
   const header = useRef<HTMLElement>(null);
   const pastHero = usePastHero(header);
+  // Another heartwood button is in view: the hero's own, or "Add it" in section 3's demo.
   const heroCtaShown = heroCta.useValue();
+  const demoActionShown = addItShown.useValue();
+  const otherActionShown = heroCtaShown || demoActionShown;
   const zooming = zoomStarted.useValue();
   const sheet = useRef<HTMLDialogElement>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -87,7 +91,7 @@ export function Nav() {
           </nav>
 
           <GiftButton
-            variant={heroCtaShown ? "quiet" : "solid"}
+            variant={otherActionShown ? "quiet" : "solid"}
             className="@max-xs:px-3"
           />
 

@@ -1,0 +1,75 @@
+/*
+  Section 4, "Say it, for later": the ink, the voice, and the box at the end.
+
+  Everything here follows the scroll through a number (see ./use-scroll-share.ts),
+  and is opacity and transform only:
+    --ink  how many words of the letter are written
+    --rec  how many bars of the voice note are recorded
+  Reduced motion: the letter is written and the voice note recorded from the
+  first paint.
+
+  It also sets what the layout reads:
+    --si-box  the height of the box scene at the end
+*/
+
+.say-it {
+  --si-box: min(max(34svh, 12rem), 70vw);
+}
+
+@media (orientation: landscape), (width >= 64rem) {
+  .say-it {
+    --si-box: min(max(46svh, 12rem), 24rem);
+  }
+}
+
+/* The letter. Each word says which it is (--i); it shows once the ink has reached it. */
+.say-letter {
+  --ink: 0;
+}
+
+.say-word {
+  opacity: clamp(0, var(--ink) - var(--i), 1);
+}
+
+/*
+  The voice note. Each bar says which it is (--i) and how loud (--h, 0 to 1).
+  Until the recording reaches it, it is a dot on the line.
+*/
+.say-wave {
+  --rec: 0;
+}
+
+.say-wave [data-part="wave"],
+.say-bar {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.say-bar {
+  scale: 1 calc(0.07 + (var(--h) - 0.07) * clamp(0, var(--rec) - var(--i), 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .say-letter {
+    --ink: 999 !important;
+  }
+
+  .say-wave {
+    --rec: 999 !important;
+  }
+}
+
+/*
+  The box at the end, on the board sections 3 and 4 share (400 × 280; see
+  ../box/BoxSceneArt.tsx). It stands on the bottom edge of its strip, as tall
+  as the strip; the rings rise over it and are cut off below. Set a little
+  left of centre, so the box and the letters beside it sit in the middle together.
+*/
+.say-board {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 400 / 280;
+  translate: -52% 0;
+}

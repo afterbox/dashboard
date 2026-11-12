@@ -167,6 +167,36 @@ We crop this scene to a panel around the table, so keep everything that matters 
 
 Draw the front of the box last, so the sheets pass behind it as they drop in. Keep the table clear at Dad's place for the box, and keep clear air above it for the papers' flight.
 
+### The open box, with Biscuit beside it (sections 3 and 4)
+
+One board, 400 × 280, used on every screen. The box stands at x 190 to 350, y 152 to 244, with its ribbon, open; the growth rings are centred on the middle of the box (270, 198). In section 3 Biscuit lies to its left with his head towards it. In section 4 he isn't there: three envelopes wait where he lay.
+
+It is drawn in three layers, so that things can drop in between them: the rings; then Biscuit, what is in the box, the envelopes and the lid; then the front of the box, last.
+
+| Group name | What it is | How it moves | Pivot |
+|---|---|---|---|
+| `biscuit` | The whole dog, awake, lying down: holds `biscuit-tail` and `biscuit-up`. | Breathes; ear and tail twitch now and then, as in the zoom scene. | None |
+| `biscuit-up` | Everything that lifts when he sits up: holds `biscuit-body` and `biscuit-head`. | Sits up, once, when the card about him lands: turns about 28°. | His hips: 62, 240 |
+| `biscuit-perk` | Inside `biscuit-head`: holds `biscuit-ear`. | The ear lifts when a card appears, and drops again. | Where the ear joins the head: 146, 198 |
+| `biscuit-tail` | The tail. | Wags when a card lands. | Where the tail joins the body: 40, 228 |
+| `box` | Each piece of the box: what's in it, its lid, its front. **Three groups with this name**, one per layer. | All squash together, slightly, each time the box catches something. | The foot of the box: 270, 244 |
+| `box-lid` | The lid, lifted, with its untied ribbon. Drawn in front of what's in the box. | Section 4: begins to close, from 32° open to 14°. | The back left corner of the rim: 188, 152 |
+| `box-item` | The top of one thing in the box, showing above the rim. **One group each**; five. | Rises into view when that thing lands. | None |
+| `envelope` | Section 4 only: one of Dad's letters, waiting beside the box. **One group each**; three. | Lifts, slides in under the lid and drops behind the front of the box. | Its centre |
+
+Keep clear air above the box for what flies into it.
+
+### Mary through the years (section 4)
+
+One board, 320 × 240, with the floor at y 196. Mary stands in one place, by a door frame where her height is marked in pencil, at about 4, 10 and 15. The three of her are drawn on top of each other and only one shows at a time: each fades into the next. No Biscuit.
+
+| Group name | What it is | How it moves | Pivot |
+|---|---|---|---|
+| `mary-4`, `mary-10`, `mary-15` | Mary at each age, standing. Each holds a `person` (with `person-head` and `person-eyes`, as in the zoom scene). | Fades in and out; breathes and blinks. | As `person`. |
+| `mary-mark` | A pencil mark on the door frame at the top of her head. **One group each**; three. | Fades in as she reaches that height. | None |
+
+The envelopes themselves (front: a stamp, a postmark, room for a handwritten address in the lower half), the waveform of the voice note and the still from the video are placeholders too; we set the handwriting in type.
+
 ## Deliverables
 
 1. Style exploration: two or three directions for Biscuit, the family and the box. We pick one before full production.

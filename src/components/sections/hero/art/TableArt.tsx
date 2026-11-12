@@ -22,8 +22,10 @@ type PersonProps = {
  *
  * Moving parts: the whole `person` breathes from where they sit; the
  * `person-head` tilts about the neck; the `person-eyes` blink.
+ *
+ * Section 4 draws Mary with it too (../../say-it/art/MaryArt.tsx).
  */
-function Person({ who, x, y, r, width, height, tone }: PersonProps) {
+export function Person({ who, x, y, r, width, height, tone }: PersonProps) {
   const shoulders = y + r - 6;
   return (
     <Part name="person" who={who} pivot={[x, shoulders + height]}>
