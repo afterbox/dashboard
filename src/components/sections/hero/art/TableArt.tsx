@@ -13,6 +13,8 @@ type PersonProps = {
   height: number;
   /** Fill class for the body. */
   tone: string;
+  /** A quiet mouth instead of a smile (section 7, Still mode). */
+  calm?: boolean;
 };
 
 /**
@@ -25,7 +27,7 @@ type PersonProps = {
  *
  * Section 4 draws Mary with it too (../../say-it/art/MaryArt.tsx).
  */
-export function Person({ who, x, y, r, width, height, tone }: PersonProps) {
+export function Person({ who, x, y, r, width, height, tone, calm = false }: PersonProps) {
   const shoulders = y + r - 6;
   return (
     <Part name="person" who={who} pivot={[x, shoulders + height]}>
@@ -37,7 +39,11 @@ export function Person({ who, x, y, r, width, height, tone }: PersonProps) {
           <circle cx={x + r / 3} cy={y - 2} r="3" className="fill-ink stroke-none" />
         </Part>
         <path
-          d={`M${x - r / 4} ${y + r / 3}Q${x} ${y + r / 1.7} ${x + r / 4} ${y + r / 3}`}
+          d={
+            calm
+              ? `M${x - r / 5} ${y + r / 2.6}Q${x} ${y + r / 2.2} ${x + r / 5} ${y + r / 2.6}`
+              : `M${x - r / 4} ${y + r / 3}Q${x} ${y + r / 1.7} ${x + r / 4} ${y + r / 3}`
+          }
           className="fill-none"
         />
       </Part>
@@ -79,8 +85,12 @@ function Hand({ who, x, y, size = 1 }: HandProps) {
  * breathes (`biscuit-body` from the floor, `biscuit-head` with it), and his
  * `biscuit-ear` and `biscuit-tail` twitch about their pivots. The `ball` on
  * the table's edge falls to the floor, once (see ../ball.ts).
+ *
+ * `night` is the closing scene (section 10), seen on the way back out: the
+ * ball is where it came to rest on the floor, and Biscuit isn't under the
+ * table. He is on the doorstep (HouseArt).
  */
-export function TableArt() {
+export function TableArt({ night = false }: { night?: boolean }) {
   return (
     <Artboard
       landscape={
@@ -121,23 +131,29 @@ export function TableArt() {
           <Hand who="mum" x={940} y={440} />
           <Hand who="you" x={1060} y={440} />
           {/* kitchen table */}
-          <Ball x={846} y={427} r={13} roll={-18} drop={260} travel={-120} />
+          {night ? (
+            <Ball x={708} y={687} r={13} roll={0} drop={0} travel={0} />
+          ) : (
+            <Ball x={846} y={427} r={13} roll={-18} drop={260} travel={-120} />
+          )}
 
-          <Part name="biscuit">
-            <Part name="biscuit-tail" pivot={[1004, 660]}>
-              <path d="M1004 660q-24 -6 -21 -28" className="fill-none" />
-            </Part>
-            <Part name="biscuit-body" pivot={[1080, 698]}>
-              <ellipse cx="1080" cy="668" rx="80" ry="30" className="fill-lantern" />
-            </Part>
-            <Part name="biscuit-head">
-              <circle cx="1156" cy="672" r="26" className="fill-lantern" />
-              <Part name="biscuit-ear" pivot={[1150, 640]}>
-                <ellipse cx="1146" cy="654" rx="10" ry="17" transform="rotate(-25 1146 654)" className="fill-keepsake" />
+          {!night && (
+            <Part name="biscuit">
+              <Part name="biscuit-tail" pivot={[1004, 660]}>
+                <path d="M1004 660q-24 -6 -21 -28" className="fill-none" />
               </Part>
-              <path d="M1162 677q6 5 12 0" className="fill-none" />
+              <Part name="biscuit-body" pivot={[1080, 698]}>
+                <ellipse cx="1080" cy="668" rx="80" ry="30" className="fill-lantern" />
+              </Part>
+              <Part name="biscuit-head">
+                <circle cx="1156" cy="672" r="26" className="fill-lantern" />
+                <Part name="biscuit-ear" pivot={[1150, 640]}>
+                  <ellipse cx="1146" cy="654" rx="10" ry="17" transform="rotate(-25 1146 654)" className="fill-keepsake" />
+                </Part>
+                <path d="M1162 677q6 5 12 0" className="fill-none" />
+              </Part>
             </Part>
-          </Part>
+          )}
           {/* Biscuit, asleep */}
         </>
       }
@@ -174,23 +190,29 @@ export function TableArt() {
           <Hand who="you" x={423} y={566} size={1.2} />
           {/* kitchen table */}
           {/* On a phone the edges of the room are cropped, so the ball stops close to the table. */}
-          <Ball x={178} y={551} r={15} roll={-8} drop={424} travel={-30} />
+          {night ? (
+            <Ball x={140} y={975} r={15} roll={0} drop={0} travel={0} />
+          ) : (
+            <Ball x={178} y={551} r={15} roll={-8} drop={424} travel={-30} />
+          )}
 
-          <Part name="biscuit">
-            <Part name="biscuit-tail" pivot={[349, 958]}>
-              <path d="M349 958q-28 -8 -24 -34" className="fill-none" />
-            </Part>
-            <Part name="biscuit-body" pivot={[440, 1004]}>
-              <ellipse cx="440" cy="968" rx="95" ry="36" className="fill-lantern" />
-            </Part>
-            <Part name="biscuit-head">
-              <circle cx="530" cy="972" r="31" className="fill-lantern" />
-              <Part name="biscuit-ear" pivot={[523, 932]}>
-                <ellipse cx="518" cy="950" rx="12" ry="20" transform="rotate(-25 518 950)" className="fill-keepsake" />
+          {!night && (
+            <Part name="biscuit">
+              <Part name="biscuit-tail" pivot={[349, 958]}>
+                <path d="M349 958q-28 -8 -24 -34" className="fill-none" />
               </Part>
-              <path d="M537 978q7 6 14 0" className="fill-none" />
+              <Part name="biscuit-body" pivot={[440, 1004]}>
+                <ellipse cx="440" cy="968" rx="95" ry="36" className="fill-lantern" />
+              </Part>
+              <Part name="biscuit-head">
+                <circle cx="530" cy="972" r="31" className="fill-lantern" />
+                <Part name="biscuit-ear" pivot={[523, 932]}>
+                  <ellipse cx="518" cy="950" rx="12" ry="20" transform="rotate(-25 518 950)" className="fill-keepsake" />
+                </Part>
+                <path d="M537 978q7 6 14 0" className="fill-none" />
+              </Part>
             </Part>
-          </Part>
+          )}
           {/* Biscuit, asleep */}
         </>
       }

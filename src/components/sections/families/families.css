@@ -1,0 +1,40 @@
+/*
+  Section 8, "For families, right now": the caret, and the answer's fade.
+
+  Still mode: a question types itself once (the same timing as section 2),
+  then its answer fades in, slowly. Opacity only. Nothing slides.
+  Reduced motion: every question and answer, from the first paint.
+*/
+
+@keyframes families-caret {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+
+.families-caret {
+  animation: families-caret 1.1s linear infinite;
+}
+
+.families-answer {
+  opacity: 0;
+  transition: opacity 1000ms var(--ease-gift);
+}
+
+[data-answered] > .families-answer {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .families-answer {
+    opacity: 1;
+  }
+  .families-caret {
+    display: none;
+  }
+}

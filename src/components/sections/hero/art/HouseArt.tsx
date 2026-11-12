@@ -1,5 +1,46 @@
+import { Biscuit, biscuitBoard } from "../../grows/BiscuitAges";
 import { Artboard } from "./Artboard";
 import { Part } from "./Part";
+
+const [dogWidth, dogHeight] = biscuitBoard("old");
+
+type DoorstepProps = {
+  /** Where the old dog lies: the left of his board, and the step under him. */
+  x: number;
+  step: number;
+  /** How wide he is drawn. */
+  width: number;
+  /** The glass at the top of the door, and the lamp over it: [x, y, width, height] and [x, y, r]. */
+  glass: readonly [number, number, number, number];
+  lamp: readonly [number, number, number];
+};
+
+/**
+ * The closing scene only: the door's glass and the porch lamp are lit, and
+ * Biscuit, old now, lies on the doorstep. He keeps his parts and their names,
+ * so he breathes like every other Biscuit.
+ */
+function Doorstep({ x, step, width, glass, lamp }: DoorstepProps) {
+  const height = (width * dogHeight) / dogWidth;
+  return (
+    <>
+      <rect x={glass[0]} y={glass[1]} width={glass[2]} height={glass[3]} rx="5" className="fill-lantern" />
+      <Part name="window-light">
+        <circle cx={lamp[0]} cy={lamp[1]} r={lamp[2]} className="fill-lantern" />
+      </Part>
+      <svg
+        x={x}
+        y={step - height}
+        width={width}
+        height={height}
+        viewBox={`0 0 ${dogWidth} ${dogHeight}`}
+        className="overflow-visible"
+      >
+        <Biscuit age="old" />
+      </svg>
+    </>
+  );
+}
 
 /**
  * PLACEHOLDER. Layer 3 of the zoom: the family's house.
@@ -11,8 +52,11 @@ import { Part } from "./Part";
  * ridge, the chimney, the slope of the roof; `perches` lists them as offsets
  * from where it is drawn). Its `bird-head` turns about the pivot, so the beak
  * points the other way.
+ *
+ * `night` is the closing scene (section 10): every light is on, and old
+ * Biscuit is on the doorstep (see Doorstep above).
  */
-export function HouseArt() {
+export function HouseArt({ night = false }: { night?: boolean }) {
   return (
     <Artboard
       landscape={
@@ -43,6 +87,7 @@ export function HouseArt() {
           <circle cx="954" cy="628" r="5" className="fill-lantern" />
           {/* door */}
           <rect x="866" y="700" width="120" height="12" rx="4" className="fill-paper" />
+          {night && <Doorstep x={846} step={700} width={104} glass={[896, 562, 60, 34]} lamp={[926, 524, 9]} />}
         </>
       }
       portrait={
@@ -72,6 +117,7 @@ export function HouseArt() {
           <circle cx="640" cy="900" r="7" className="fill-lantern" />
           {/* door */}
           <rect x="522" y="1000" width="160" height="14" rx="5" className="fill-paper" />
+          {night && <Doorstep x={492} step={1000} width={142} glass={[562, 808, 80, 46]} lamp={[602, 758, 12]} />}
         </>
       }
     />

@@ -1,6 +1,8 @@
 import { BoxBack, BoxFront, BoxRings } from "./box/BoxSceneArt";
-import { FillStage } from "./fill-it/FillStage";
-import { HandOffNote } from "./fill-it/HandOffNote";
+import { FillStage, HandOffNote } from "./lazy";
+// The section's styles load with the page; its script comes later (./lazy.tsx).
+import "./box/box-scene.css";
+import "./fill-it/fill-it.css";
 
 /**
  * 3. "Fill it, a little at a time": the playful demo.
@@ -22,7 +24,12 @@ import { HandOffNote } from "./fill-it/HandOffNote";
 export function FillIt() {
   return (
     // Clipped at the sides only: the flying cards are placed by transform, and must never widen the page.
-    <section id="how-it-works" data-section="fill-it" aria-labelledby="fill-it-line" className="overflow-x-clip bg-linen">
+    <section
+      id="how-it-works"
+      data-section="fill-it"
+      aria-labelledby="fill-it-line"
+      className="scroll-mt-16 overflow-x-clip bg-linen md:scroll-mt-18"
+    >
       <FillStage rings={<BoxRings />} back={<BoxBack />} front={<BoxFront />} />
       <HandOffNote />
     </section>

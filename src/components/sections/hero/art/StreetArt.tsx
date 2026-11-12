@@ -47,8 +47,12 @@ function Cloud({ x, base, width, puffs }: CloudProps) {
  *
  * Clouds: 6 to 12% of the scene's width, each at its own height so that no two
  * ever cross, and none in the strip the nav covers.
+ *
+ * `night` is the closing scene (section 10): the same street later on, with
+ * the neighbours' lights on. The road is left clear there, for the words.
  */
-export function StreetArt() {
+export function StreetArt({ night = false }: { night?: boolean }) {
+  const pane = night ? "fill-lantern" : "fill-keepsake";
   return (
     <Artboard
       landscape={
@@ -72,8 +76,8 @@ export function StreetArt() {
 
           <rect x="150" y="400" width="410" height="300" className="fill-paper" />
           <polygon points="120,400 355,262 590,400" className="fill-keepsake" />
-          <rect x="215" y="470" width="84" height="84" rx="6" className="fill-keepsake" />
-          <rect x="410" y="470" width="84" height="84" rx="6" className="fill-keepsake" />
+          <rect x="215" y="470" width="84" height="84" rx="6" className={pane} />
+          <rect x="410" y="470" width="84" height="84" rx="6" className={pane} />
           {/* neighbour */}
 
           <Part name="tree" pivot={[690, 700]}>
@@ -97,7 +101,7 @@ export function StreetArt() {
 
           <rect x="1400" y="380" width="320" height="320" className="fill-paper" />
           <polygon points="1370,380 1560,250 1750,380" className="fill-keepsake" />
-          <rect x="1460" y="450" width="84" height="84" rx="6" className="fill-keepsake" />
+          <rect x="1460" y="450" width="84" height="84" rx="6" className={pane} />
 
           <rect x="-10" y="700" width="1620" height="56" className="fill-linen" />
           <rect x="-10" y="756" width="1620" height="160" className="fill-paper" />
@@ -125,9 +129,11 @@ export function StreetArt() {
 
           <rect x="-150" y="540" width="280" height="460" className="fill-paper" />
           <polygon points="-180,540 -10,410 160,540" className="fill-keepsake" />
+          {night && <rect x="20" y="620" width="76" height="76" rx="6" className={pane} />}
 
           <rect x="790" y="500" width="280" height="500" className="fill-paper" />
           <polygon points="760,500 930,370 1100,500" className="fill-keepsake" />
+          {night && <rect x="812" y="590" width="76" height="76" rx="6" className={pane} />}
 
           <Part name="tree" pivot={[847, 1000]}>
             <Part name="tree-trunk">
@@ -146,7 +152,7 @@ export function StreetArt() {
 
           <rect x="-400" y="1000" width="1700" height="76" className="fill-linen" />
           <rect x="-400" y="1076" width="1700" height="930" className="fill-paper" />
-          <line x1="-410" y1="1340" x2="1310" y2="1340" strokeDasharray="70 60" />
+          {!night && <line x1="-410" y1="1340" x2="1310" y2="1340" strokeDasharray="70 60" />}
           {/* street at dusk */}
         </>
       }

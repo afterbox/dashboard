@@ -63,7 +63,7 @@ function Board({ mouth = false, children }: BoardProps) {
 const nth = (k: number) => ({ "--k": k }) as CSSProperties;
 
 /** From the oldest ring outward. */
-const radii = [104, 128, 152, 176] as const;
+export const radii = [104, 128, 152, 176] as const;
 
 /** The growth rings around the box. The line is held at 1.75px on screen, as in the hero. */
 export function BoxRings() {
@@ -116,7 +116,7 @@ function Biscuit() {
 }
 
 /** The tops of the things in the box, in the order they land: from the open side, away from the hinge. */
-const items = [
+export const items = [
   { x: 304, top: 134, tilt: 5, tone: "fill-paper" },
   { x: 246, top: 132, tilt: -4, tone: "fill-blush" },
   { x: 327, top: 138, tilt: 8, tone: "fill-paper" },

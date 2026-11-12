@@ -14,6 +14,11 @@ type Props = {
   bleed?: string;
   /** Part of the final frame, so it stays, still, when motion is reduced. */
   inFinalFrame?: boolean;
+  /**
+   * How this plane is held when motion is reduced, where that isn't full size
+   * (the kitchen seen small through the window, in the closing scene). Classes.
+   */
+  held?: string;
   children: ReactNode;
 };
 
@@ -26,7 +31,7 @@ const finalFrame =
  * the same point, so depth comes only from each one growing at its own rate.
  * Hidden outright once it has faded, so it costs nothing to paint.
  */
-export function Plane({ name, progress, spec, bleed, inFinalFrame = false, children }: Props) {
+export function Plane({ name, progress, spec, bleed, inFinalFrame = false, held, children }: Props) {
   const scale = useTransform(progress, (p) => zoomAt(spec.scale, p));
   const opacity = useTransform(progress, (p) => fadeAt(spec.opacity, p));
   const visibility = useTransform(opacity, (o) => (o > 0 ? "visible" : "hidden"));
@@ -36,7 +41,7 @@ export function Plane({ name, progress, spec, bleed, inFinalFrame = false, child
       data-plane={name}
       style={{ scale, opacity, visibility }}
       className={`absolute inset-0 landscape:origin-[68%_50%] portrait:origin-[50%_36%] ${
-        inFinalFrame ? finalFrame : "motion-reduce:hidden"
+        held ?? (inFinalFrame ? finalFrame : "motion-reduce:hidden")
       }`}
     >
       {bleed && <div className={`absolute -inset-[30%] ${bleed}`} />}

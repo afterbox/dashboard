@@ -1,6 +1,9 @@
 import { BoxBack, BoxFront, BoxRings } from "./box/BoxSceneArt";
+import { SayStage } from "./lazy";
 import { MaryArt } from "./say-it/art/MaryArt";
-import { SayStage } from "./say-it/SayStage";
+// The section's styles load with the page; its script comes later (./lazy.tsx).
+import "./box/box-scene.css";
+import "./say-it/say-it.css";
 
 /**
  * 4. "Say it, for later": the messages. The emotional core of the page.

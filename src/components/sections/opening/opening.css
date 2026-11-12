@@ -1,0 +1,68 @@
+/*
+  Section 7, "When the time comes": the one thing that moves.
+
+  Still mode. The scene is told one thing, once:
+    data-opened   most of it has come on screen
+  and then, in order, slowly: the message to Mary fades in, the lid lifts
+  (the signature moment, 1600ms), and her letter rises out of the box.
+  Nothing overshoots, nothing glows, nothing else moves, and it never plays
+  backwards or again.
+  Reduced motion: the lid is up and the letter out from the first paint.
+
+  The scene is drawn twice (./OpeningArt.tsx). Which shows depends on the
+  shape of the panel it is in.
+*/
+
+.opening-landscape {
+  display: none;
+}
+
+@container opening (aspect-ratio >= 1) {
+  .opening-landscape {
+    display: block;
+  }
+  .opening-portrait {
+    display: none;
+  }
+}
+
+.opening-message {
+  opacity: 0;
+  transition: opacity 1000ms var(--ease-gift) 300ms;
+}
+
+.opening-scene [data-part="box-lid"] {
+  transition: rotate 1600ms var(--ease-gift) 1600ms;
+}
+
+.opening-scene [data-part="letter"] {
+  translate: 0 58px;
+  opacity: 0;
+  transition:
+    translate 1800ms var(--ease-gift) 2700ms,
+    opacity 1000ms var(--ease-gift) 2700ms;
+}
+
+.opening-scene[data-opened] .opening-message {
+  opacity: 1;
+}
+.opening-scene[data-opened] [data-part="box-lid"] {
+  rotate: -36deg;
+}
+.opening-scene[data-opened] [data-part="letter"] {
+  translate: 0 0;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .opening-scene .opening-message {
+    opacity: 1;
+  }
+  .opening-scene [data-part="box-lid"] {
+    rotate: -36deg;
+  }
+  .opening-scene [data-part="letter"] {
+    translate: 0 0;
+    opacity: 1;
+  }
+}

@@ -18,7 +18,8 @@ const clearPerCharacter = 15;
 /** A breath before the next question starts. */
 const beforeNext = 400;
 
-function SearchIcon() {
+/** The magnifying glass at the start of a search bar. Section 8 draws its questions the same way. */
+export function SearchIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-6 shrink-0 fill-none stroke-current text-ink-muted">
       <circle cx="11" cy="11" r="6.25" strokeWidth="1.5" />

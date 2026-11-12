@@ -47,6 +47,17 @@ type Props = {
  *   mary-4 · mary-10 · mary-15 (each a person) · mary-mark
  *   wave (wave-bar)
  *
+ * Sections 5 to 7 use the box with its lid on (../../box/SealedBoxArt.tsx),
+ * Biscuit at three ages (../../grows/BiscuitAges.tsx) and the hall on the day
+ * the box opens (../../opening/OpeningArt.tsx). The story moves the box; the
+ * clock only Biscuit, and not at all in section 7 (Still mode):
+ *   box (box-item, box-lid (bow (bow-loop, bow-knot))) · ring-next · letter
+ *   biscuit (biscuit-tail, biscuit-body, biscuit-head (biscuit-muzzle, biscuit-ear))
+ *
+ * Section 10 is the hero's layers again, at night (`night` on StreetArt,
+ * HouseArt and TableArt). It adds nothing new by name: the porch lamp is a
+ * window-light, and the dog on the doorstep is the old biscuit above.
+ *
  * docs/illustrator-brief.md lists every name with its pivot. Keep it in step.
  */
 export function Part({ name, pivot, who, perches, className, children }: Props) {

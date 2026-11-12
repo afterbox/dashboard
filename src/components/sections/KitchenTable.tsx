@@ -1,7 +1,8 @@
 import { KitchenNightArt } from "./kitchen-table/KitchenNightArt";
-import { KitchenStage } from "./kitchen-table/KitchenStage";
-import { SearchBar } from "./kitchen-table/SearchBar";
 import { SlowFade } from "./kitchen-table/SlowFade";
+import { KitchenStage, SearchBar } from "./lazy";
+// The section's styles load with the page; its script comes later (./lazy.tsx).
+import "./kitchen-table/kitchen-table.css";
 
 /** The two facts. */
 const facts = ["About 400 hours of admin", "£15B in unclaimed UK assets"] as const;

@@ -8,8 +8,6 @@ import { clock, videoLength, voiceLength } from "./messages";
 import { barsNeeded, inkNeeded, LetterLines, VideoStill, Wave } from "./previews";
 import { useSayLife } from "./say-life";
 import { useArrived, useScrollShare } from "./use-scroll-share";
-import "../box/box-scene.css";
-import "./say-it.css";
 
 type Props = {
   /** The art, passed in already rendered so it stays out of the script bundle. */

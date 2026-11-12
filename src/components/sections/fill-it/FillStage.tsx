@@ -8,8 +8,6 @@ import { useDrops } from "./drop";
 import { useFillLife } from "./fill-life";
 import { addItShown } from "./signals";
 import { useBeats } from "./use-beats";
-import "../box/box-scene.css";
-import "./fill-it.css";
 
 type Props = {
   /** The box scene's three layers, passed in already rendered so the art stays out of the script bundle. */

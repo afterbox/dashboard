@@ -9,6 +9,7 @@ import { KitchenTable } from "@/components/sections/KitchenTable";
 import { Nav } from "@/components/sections/Nav";
 import { SayIt } from "@/components/sections/SayIt";
 import { Sealed } from "@/components/sections/Sealed";
+import { StillMode } from "@/components/sections/still/StillMode";
 import { WhenTheTimeComes } from "@/components/sections/WhenTheTimeComes";
 
 // The landing page: one story, in the order of docs/landing-page-story.md.
@@ -23,8 +24,10 @@ export default function Home() {
         <SayIt />
         <Sealed />
         <GrowsWithYou />
-        <WhenTheTimeComes />
-        <FamilySupport />
+        <StillMode>
+          <WhenTheTimeComes />
+          <FamilySupport />
+        </StillMode>
         <ForOrganisations />
         <FinalScene />
       </main>

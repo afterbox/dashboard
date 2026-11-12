@@ -12,18 +12,20 @@ An original illustrated cast and set of scenes for the landing page (desktop and
 
 ### Characters
 1. **The family:** a parent (the person building the vault), their partner, their daughter **Mary** at four ages (about 4, 10, 15 and 25), and a grandparent. They should be inclusive and warm, with varied skin tones from a natural range and simple, friendly faces.
-2. **Biscuit, the family dog:** the one recurring character. A medium-sized, scruffy, lovable mongrel. Needed at three ages: puppy, adult, and old with a grey muzzle. Poses: asleep, sitting up and alert, wagging, trotting, nudging a box with his nose, and resting by a door. He is part of the family, **not a mascot**: he never talks, holds signs or appears in a logo.
+2. **Biscuit, the family dog:** the one recurring character. A medium-sized, scruffy, lovable mongrel. Needed at three ages: puppy, adult, and old with a grey muzzle. Poses: asleep, sitting up and alert, wagging, trotting, nudging a box with his nose, resting by a door, lying down in profile at each of the three ages (the years, section 6), and lying on the doorstep at night (the closing scene). He is part of the family, **not a mascot**: he never talks, holds signs or appears in a logo.
 
 ### Objects
-The **box**: a small linen-coloured keepsake box with a gold ribbon. It's the hero object. It needs to be shown closed, lid lifting, and open, with items dropping in. Also: envelopes addressed by hand, a phone showing an app screen (we supply the screen), a key that splits into three pieces, a kitchen table with a laptop and scattered papers, a lamp.
+The **box**: a small linen-coloured keepsake box with a gold ribbon. It's the hero object. It needs to be shown closed, lid lifting, and open, with items dropping in; sealed, with the ribbon tied in a bow; and once more with the ribbon untied and no gold, for the day it opens. Also: envelopes addressed by hand, one letter that rises out of the open box, a phone showing an app screen (we supply the screen), a key that splits into three pieces, a kitchen table with a laptop and scattered papers, a lamp.
 
 ### Scenes (each in **landscape 16:9 and portrait 9:16**, composed for each, not cropped)
 1. **The street at dusk** → **the house** → **the lit window** → **the family at the kitchen table** with Biscuit asleep underneath. These are separate layers for a continuous zoom (see "Technical" below).
 2. **The growth rings:** concentric rings (like a tree's) that the camera travels through, with space beside each ring for a short label.
 3. **The kitchen table at night:** an empty chair, scattered papers, one lamp. Quiet, not tragic.
 4. **Mary through the years:** at 4, 10 and 15 for the messages section, and at about 25 receiving her letter.
-5. **The house at night, every light on,** with old Biscuit on the doorstep (the closing scene).
+5. **The house at night, every light on,** with old Biscuit on the doorstep (the closing scene). It is the zoom scene again, later the same night, on the same layers: see "The house at night" below.
 6. **Ambient life:** a bird on the roof, three to five clouds, a tree, and a small ball on the kitchen table. These move on their own; "Parts for animation" below lists exactly how each must be split.
+7. **The day the box opens:** the hall of the same house, years on. Mary, about 25, stands by the box; old Biscuit rests by the door. Quiet and still, with no gold: see "The day the box opens" below.
+8. **Biscuit through the years:** the same dog three times, a puppy, grown, and old with a grey muzzle, each a small picture of its own.
 
 ## Style
 
@@ -197,11 +199,122 @@ One board, 320 × 240, with the floor at y 196. Mary stands in one place, by a d
 
 The waveform of the voice note and the still from the video are placeholders too. The handwritten addresses ("For Mary, on her 18th birthday") are set in type on the cards, not drawn.
 
+### The sealed box and the key (section 5)
+
+**The box, sealed.** The same board as the open box, 400 × 280, with the box in the same place (x 190 to 350, y 152 to 244). The lid arrives part-closed, comes down the rest of the way, and the ribbon ties itself in a bow on top. This section sits on a Keepsake band: there the box is drawn in Paper with the gold ribbon, and outlined in Keepsake instead of Ink, so it reads as cut out of the band. The rings are drawn in code.
+
+| Group name | What it is | How it moves | Pivot |
+|---|---|---|---|
+| `box` | The whole box: holds everything below. | Takes the weight when the lid lands: squashes a touch, once. | The foot of the box: 270, 244 |
+| `box-lid` | The lid (x 184 to 356, y 124 to 152) with the ribbon across it: holds `bow`. | Comes down from part-closed to shut. | The back left corner of the rim: 188, 152 |
+| `box-item` | The top of one thing in the box, showing above the rim. **One group each**; five. | Seen until the lid is down. | None |
+| `bow` | The tied ribbon on the middle of the lid: holds the two groups below. | Appears as the ribbon ties itself. | None |
+| `bow-loop` | One loop of the bow. **One group each**; two. | Grows out of the knot. | The knot: 270, 121 |
+| `bow-knot` | The knot between the loops. | Appears first. | The knot: 270, 121 |
+
+Draw the lid and the bow so the bow can be left off: the same box is used with the ribbon untied in "The day the box opens".
+
+**The key.** One key, delivered as **three separate pieces**, each on its own board of 64 × 40, lying on its side with the round end to the left:
+
+| Piece | What it is |
+|---|---|
+| The bow | The round end you hold, with the start of the shaft. |
+| The shaft | The straight middle. |
+| The bit | The end of the shaft, with the teeth. |
+
+- The pieces are cut **square** where they meet (the shaft is 10 thick, from y 15 to y 25, and runs to the edge of each board), so the three sit edge to edge as one key and come apart cleanly.
+- One flat colour, Linen, with no outline: the key is cut out of the Keepsake band.
+- Keep it plain enough to read when it is 45px tall. On a phone the whole key stands upright (we turn each piece a quarter turn) and comes apart top to bottom, so it must read both ways up.
+- Nothing else is drawn here: the three holders of the pieces are words, not pictures.
+
+### Biscuit through the years (section 6)
+
+Biscuit three times, each lying down in profile, **facing right** (the way the years run), each on a small board of its own. They sit on a timeline beside the years 2026, 2030 and 2034, so each must read at about 100px wide.
+
+| Age | Board | What changes |
+|---|---|---|
+| Puppy | 96 × 60 | Small, and mostly head. Tail up. |
+| Grown | 128 × 68 | As in the zoom scene. |
+| Old | 132 × 66 | Lower to the ground, chin nearly down, tail lying behind him, a pale grey muzzle. |
+
+Each is split the same way as the Biscuit in the zoom scene, so he breathes and twitches the same way, with one more group on the old dog:
+
+| Group name | What it is | How it moves | Pivot (puppy · grown · old) |
+|---|---|---|---|
+| `biscuit` | The whole dog: holds the groups below. | Stays where it is. | None |
+| `biscuit-tail` | The tail. | One slow wag. | Where the tail joins the body: 20, 44 · 24, 48 · 22, 54 |
+| `biscuit-body` | Body and legs. | Breathes. | On the ground, under the middle of the body: 44, 58 · 62, 66 · 62, 65 |
+| `biscuit-head` | Head and muzzle: holds the ear, and on the old dog `biscuit-muzzle`. | Rises a touch with each breath. | None |
+| `biscuit-ear` | The ear we can see. | Twitches. | Where the ear joins the head: 69, 20 · 100, 25 · 101, 36 |
+| `biscuit-muzzle` | **Old dog only:** the pale patch round his mouth. | Never moves. | None |
+
+The old dog is used twice more: resting by the door in "The day the box opens" (in a quieter coat, and perfectly still) and on the doorstep in "The house at night".
+
+### The day the box opens (section 7)
+
+The hall of the same house, years on. Mary, about 25, stands beside a small table with the box on it. The door frame still has her three heights marked on it in pencil (from "Mary through the years"), and Biscuit, old now, lies by the door. A message has reached her; the lid lifts, slowly, and her letter rises out.
+
+**This scene is for a family in loss, so it follows different rules from every other scene:**
+
+- **No gold and no Heartwood.** Keepsake, Linen, Paper and the line colour only. Mary's clothes and the box's ribbon are Keepsake; Biscuit's coat is a pale neutral, not gold.
+- **Nothing moves but the lid and the letter.** Nobody breathes, blinks or twitches. Biscuit and Mary keep their group names (`biscuit`, `person`) so the art matches the rest, but we leave them still.
+- Mary is calm: a quiet, closed mouth, not a smile. Nobody is crying or in distress.
+- The ribbon is **untied**: no bow.
+
+It is drawn on the box's own board (the box at x 190 to 350, y 152 to 244), with the floor at **y 300** and a small table under the box (top at y 244, x 164 to 376). Two compositions:
+
+| | Board | Left to right |
+|---|---|---|
+| Landscape | x −150 to 390, y −130 to 330 (540 × 460) | The door (x −130 to −26), Biscuit lying by it (x −74 to 58), Mary (centred on x 110), the box on its table. |
+| Portrait | x 70 to 390, y −120 to 380 (320 × 500) | The door (x 84 to 188) behind Mary (centred on x 124), the box on its table; Biscuit lies in front of them on the floor (x 86 to 218). |
+
+The wall is a flat colour and the floor runs on past every edge, so the scene can stand on the bottom edge of a panel of any shape. The pencil marks are on the door frame at 86, 118 and 148 above the floor.
+
+| Group name | What it is | How it moves | Pivot |
+|---|---|---|---|
+| `box-lid` | The lid, with the untied ribbon across it. | Lifts, slowly (1.6 seconds), to about 36° open. | The back left corner of the rim: 188, 152 |
+| `letter` | Mary's letter: one envelope, inside the box. **Drawn between the inside of the box and its front.** | Rises out of the open box by about 58, and stops above the rim (centred near 304, 114), tilted about 6°. | None |
+
+Keep clear air above the box for the lid and the letter, and keep the top right of the landscape scene plain: the message to Mary sits there as a card.
+
+### The house at night (section 10, the closing scene)
+
+The zoom scene again, played backwards: from the box, out through the rings, the kitchen, the window and the house, to the street. It uses **the same boards, the same shared centre and the same layers** as the zoom scene, with these differences. Everything not listed stays as it is, including every group name, pivot and perch.
+
+**Night colours.** We make the night by swapping the palette in code, so every fill and line must be exactly one of the palette colours, with no blends. These are the night values, if you want to check your drawing against them:
+
+| Name | Night |
+|---|---|
+| Linen | `#1c1416` |
+| Paper | `#2b2023` |
+| Blush | `#3a2529` |
+| Heartwood | `#ea8670` |
+| Keepsake | `#c9a3b6` |
+| Lantern | `#e9b562` |
+| Sage | `#9db894` |
+| Lines | `#f6ede6` |
+
+**The street.** Every window on the neighbours' houses is lit (Lantern). In portrait, two more lit windows show at the edges: x 20 to 96, y 620 to 696 and x 812 to 888, y 590 to 666. The road has no markings, and nothing sits on it or below it: the closing words and the button are set there.
+
+**The house.** Every light is on:
+
+| | Landscape | Portrait |
+|---|---|---|
+| The glass at the top of the front door, lit | x 896 to 956, y 562 to 596 | x 562 to 642, y 808 to 854 |
+| The porch lamp over the door | centre 926, 524, radius 9 | centre 602, 758, radius 12 |
+| Old Biscuit, lying on the doorstep | x 846 to 950, on the step at y 700 | x 492 to 634, on the step at y 1000 |
+
+- The porch lamp is a group named `window-light`, so its brightness wavers like the kitchen window's.
+- Biscuit is the old dog from "Biscuit through the years", in his gold coat, with the same groups and pivots, lying in front of the door, facing right. He breathes; his ear and tail twitch now and then.
+- The bird is still on the roof.
+
+**The kitchen**, seen through the window on the way out: the same family at the table. **Biscuit isn't under the table** (he is on the doorstep), and the **ball is on the floor** where it came to rest (landscape centre 708, 687 · portrait centre 140, 975), not on the table.
+
 ## Deliverables
 
 1. Style exploration: two or three directions for Biscuit, the family and the box. We pick one before full production.
 2. Characters (all ages and poses above).
-3. Scenes 1–6, landscape and portrait.
+3. Scenes 1–8, landscape and portrait (scene 8 is three small pictures, used at every size).
 4. Source files and an export of every asset as SVG.
 
 ## Contact

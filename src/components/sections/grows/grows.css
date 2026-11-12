@@ -1,0 +1,287 @@
+/*
+  Section 6, "It grows with you": the years, and where everything sits on them.
+
+  The rings are the years. Each is centred on the box, and its radius is how
+  far that year is from the day the box was sealed, so the ring crosses the
+  line of years exactly where its year is written. Everything is placed from
+  that one point:
+    --ox, --oy   the middle of the box
+  and every ring, year, card and dog says which year it belongs to:
+    --k          1 for the first year after the box was sealed, and so on
+
+  The scene is told one number and CSS does the rest:
+    --step       how many years have passed. A year's ring, its label and what
+                 afterbox said that year are on once the count reaches it, and
+                 off again if the count drops (scrolling back up).
+
+  Two compositions, drawn twice rather than shrunk:
+    upright   (the default) the box at the top, the years run down the middle
+              of the screen, and the page scrolls through them
+    wide      a screen at least 64rem wide and 40rem tall: the box at the
+              left, the years run across, and the scene is pinned while they pass
+
+  Rhythm: a ring grows and settles (`ease-gift`, 900ms), its year appears,
+  then the card pops in with the one small overshoot (`ease-play`).
+  Reduced motion: every year, from the first paint, and nothing is pinned.
+*/
+
+.grows {
+  --gr-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 16);
+}
+
+@media (width >= 48rem) {
+  .grows {
+    --gr-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 18);
+  }
+}
+
+.grows-scene {
+  --step: 0;
+  /* The box's strip: the size it had at the top of section 5 on a phone (--se-box). */
+  --strip: min(max(34svh, 12rem), 70vw);
+  /* One year, top to bottom. */
+  --row: 16rem;
+  /* From the bottom of the strip down to the first year. */
+  --lead: 4.5rem;
+  --ox: 50%;
+  --oy: calc(var(--strip) * 0.707);
+  position: relative;
+  padding-top: var(--strip);
+}
+
+/* The rings run off the sides of the screen (the section clips them) and stop at the scene's top and bottom. */
+.grows-rings {
+  position: absolute;
+  inset: 0;
+  overflow-x: visible;
+  overflow-y: clip;
+}
+
+.grows-ring {
+  --on: clamp(0, var(--step) - var(--k) + 1, 1);
+  --r: calc(var(--strip) * 0.293 + var(--lead) + (var(--k) - 1) * var(--row));
+  position: absolute;
+  top: var(--oy);
+  left: var(--ox);
+  width: calc(2 * var(--r));
+  height: calc(2 * var(--r));
+  border-style: solid;
+  border-width: 1.75px;
+  border-radius: 50%;
+  translate: -50% -50%;
+  opacity: var(--on);
+  scale: calc(0.95 + 0.05 * var(--on));
+  transition:
+    scale 900ms var(--ease-gift),
+    opacity 320ms var(--ease-state);
+}
+
+/* Where the rings would run under the words above the scene, they fade into the page instead. */
+.grows-fade {
+  /* How far down the fade the page colour is still solid. */
+  --solid: 0%;
+  position: absolute;
+  right: -50vw;
+  left: -50vw;
+  height: 3rem;
+  pointer-events: none;
+}
+.grows-fade-top {
+  top: 0;
+  background: linear-gradient(to bottom, var(--color-linen) var(--solid), transparent);
+}
+.grows-fade-bottom {
+  display: none;
+  bottom: 0;
+  background: linear-gradient(to top, var(--color-linen), transparent);
+}
+
+/* The box: the board (400 × 280) stands on the bottom of the strip, the middle of the box on the line of years. */
+.grows-box {
+  position: absolute;
+  top: 0;
+  left: var(--ox);
+  height: var(--strip);
+  aspect-ratio: 400 / 280;
+  translate: -67.5% 0;
+}
+
+/* A year, written on its ring: the page colour behind it breaks the line, like a height on a map. */
+.grows-label {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 2rem;
+  padding-inline: 0.625rem;
+  opacity: var(--on);
+  transition: opacity 320ms var(--ease-state) calc(var(--on) * 160ms);
+}
+
+/* The year the box was sealed: under the box, and there from the start. */
+.grows-first {
+  --on: 1;
+  position: absolute;
+  top: calc(var(--strip) * 0.9);
+  left: var(--ox);
+  translate: -50% 0;
+}
+
+.grows-years {
+  position: relative;
+  padding-top: calc(var(--lead) - 1rem);
+}
+
+.grows-year {
+  --on: clamp(0, var(--step) - var(--k) + 1, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  height: var(--row);
+}
+
+/* What afterbox said that year pops in, a moment after the ring. */
+.grows-pop {
+  opacity: var(--on);
+  scale: calc(0.9 + 0.1 * var(--on));
+  transition:
+    scale 420ms var(--ease-play) calc(var(--on) * 380ms),
+    opacity 200ms var(--ease-state) calc(var(--on) * 380ms);
+}
+.grows-card {
+  width: min(100%, 20rem);
+}
+
+/*
+  Biscuit, once at each age. He is there from his year on, and steps back
+  (fainter) when the next one, older, arrives: --until is that year.
+*/
+.grows-biscuit {
+  --older: clamp(0, var(--step) - var(--until) + 1, 1);
+  width: 5.5rem;
+  opacity: calc(var(--on) * (1 - 0.55 * var(--older)));
+  transition: opacity 480ms var(--ease-state);
+}
+/* The puppy lies beside the box, his head towards it, as in section 3. */
+.grows-puppy {
+  --on: 1;
+  position: absolute;
+  top: calc(var(--strip) * 0.871);
+  left: calc(var(--ox) - var(--strip) * 0.516);
+  width: calc(var(--strip) * 0.2);
+  translate: 0 -100%;
+}
+
+/* ---------------------------------------------------------------- wide */
+
+@media (width >= 64rem) and (height >= 40rem) {
+  /* The scene, pinned under the nav, and the scroll the years pass in. */
+  .grows {
+    height: 220svh;
+  }
+  .grows-pin {
+    position: sticky;
+    top: var(--gr-nav);
+    height: calc(100svh - var(--gr-nav));
+  }
+  .grows-frame {
+    position: relative;
+    height: 100%;
+  }
+  .grows-copy {
+    position: relative;
+    z-index: 3;
+  }
+
+  .grows-scene {
+    /* The line of years: far enough down that the words fit above it and the cards below. */
+    --ox: 8cqw;
+    --oy: clamp(20rem, 50cqh, 30rem);
+    /* From one year to the next. */
+    --gap: 14.4cqw;
+    position: absolute;
+    inset: 0 calc(var(--spacing) * 6);
+    container: grows / size;
+    padding: 0;
+  }
+
+  .grows-ring {
+    --r: calc(var(--k) * var(--gap));
+  }
+  /* Solid behind the words (they end 13rem down), then gone by the check-ins. */
+  .grows-fade {
+    --solid: 82%;
+    height: 16rem;
+  }
+  .grows-fade-bottom {
+    display: block;
+    height: 7rem;
+  }
+
+  .grows-box {
+    top: var(--oy);
+    width: 33cqw;
+    height: auto;
+    translate: -67.5% -70.7%;
+  }
+  .grows-first {
+    top: calc(var(--oy) + 3.8cqw + 0.75rem);
+  }
+
+  /* Each year's parts are placed on the scene, not in its row. */
+  .grows-years {
+    position: static;
+    padding: 0;
+  }
+  .grows-year {
+    display: block;
+    height: 0;
+  }
+  .grows-year > * {
+    position: absolute;
+  }
+  .grows-year > .grows-label {
+    top: var(--oy);
+    left: calc(var(--ox) + var(--k) * var(--gap));
+    translate: -50% -50%;
+  }
+  /* Cards hang below the line; the check-in sits above it. */
+  .grows-year > .grows-card {
+    top: calc(var(--oy) + 2.75rem);
+    left: calc(var(--ox) + var(--k) * var(--gap) - 1.25rem);
+    width: min(17rem, 25.5cqw);
+  }
+  /* The last card would run off the screen: it keeps to the page's right margin instead. */
+  .grows-year:last-child > .grows-card {
+    right: calc(var(--spacing) * -3);
+    left: auto;
+  }
+  .grows-year > .grows-chip {
+    bottom: calc(100% - var(--oy) + 2.5rem);
+    left: calc(var(--ox) + var(--k) * var(--gap));
+    width: max-content;
+    translate: -50% 0;
+  }
+  /* Biscuit lies on the line, between two years. */
+  .grows-year > .grows-biscuit {
+    top: var(--oy);
+    left: calc(var(--ox) + (var(--k) + 0.5) * var(--gap));
+    width: 7cqw;
+    translate: -50% -50%;
+  }
+  .grows-puppy {
+    top: var(--oy);
+    left: calc(var(--ox) + 0.65 * var(--gap));
+    width: 4.6cqw;
+    translate: -50% -50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grows {
+    height: auto;
+  }
+  .grows-scene {
+    --step: 9 !important;
+  }
+}

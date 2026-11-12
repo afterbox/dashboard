@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState, type RefObject } from "react";
+import { closingCta } from "@/components/sections/closing/signals";
 import { addItShown } from "@/components/sections/fill-it/signals";
 import { heroCta, zoomStarted } from "@/components/sections/hero/signals";
+import { talkShown } from "@/components/sections/organisations/signals";
+import { stillShown } from "@/components/sections/still/signals";
 import { GiftButton } from "@/components/ui/GiftButton";
 import { Wordmark } from "@/components/ui/Wordmark";
 
 const links = [
   { href: "#how-it-works", label: "How it works" },
-  { href: "#for-families", label: "For families" },
-  { href: "#for-organisations", label: "For organisations" },
+  { href: "#families", label: "For families" },
+  { href: "#organisations", label: "For organisations" },
 ];
 
 /** True once the hero has scrolled up behind the nav. */
@@ -37,7 +40,13 @@ export function Nav() {
   // Another heartwood button is in view: the hero's own, or "Add it" in section 3's demo.
   const heroCtaShown = heroCta.useValue();
   const demoActionShown = addItShown.useValue();
-  const otherActionShown = heroCtaShown || demoActionShown;
+  // Or the page is speaking to a family in loss (sections 7 and 8), where the pill never sells.
+  const still = stillShown.useValue();
+  // Or section 9's own action, "Talk to us", is in view.
+  const talk = talkShown.useValue();
+  // Or the closing scene's button, "Begin with someone you love".
+  const closing = closingCta.useValue();
+  const otherActionShown = heroCtaShown || demoActionShown || still || talk || closing;
   const zooming = zoomStarted.useValue();
   const sheet = useRef<HTMLDialogElement>(null);
   const [sheetOpen, setSheetOpen] = useState(false);

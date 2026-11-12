@@ -4,7 +4,6 @@ import { useRef, type ReactNode } from "react";
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
 import { useHandOff } from "./hand-off";
 import { useQuietLife } from "./quiet-life";
-import "./kitchen-table.css";
 
 type Props = {
   /** The night kitchen, passed in already rendered so the art stays out of the script bundle. */

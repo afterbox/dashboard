@@ -1,0 +1,80 @@
+
+# /
+
+## header
+afterbox | How it works | For families | For organisations | Build their gift | How it works | For families | For organisations | Close
+[aria-label] afterbox, home
+[aria-label] Main
+[aria-label] Open menu
+[aria-label] Menu
+
+## hero
+bought a home | Mary is born | a new job | Mary turns 10 | bought a home | Mary is born | a new job | Mary turns 10 | Mary, everything you'll need | is in here. | You won't have to guess. | Love, Dad x | Build it for them. | Before they need it. | Everything they'll need to find, and everything you want them to hear. Gathered as your life grows, and given to them when the time comes. | Build their gift
+[aria-label] A street at dusk. One house has a lit window. Inside, a family sits at the kitchen table, with Biscuit the dog asleep underneath.
+
+## kitchen-table
+Picture the person you love most, three days after losing you. | Sitting at the kitchen table, not knowing where to begin. | They search. They guess. They miss things. | Did he have life insurance? | Did he have life insurance? | Which pension was from his first job? | Where did he keep the keys to his crypto wallet? | What did he want for his funeral? | About 400 hours of admin | £15B in unclaimed UK assets | It doesn't have to be this way.
+[aria-label] The same kitchen, at night, with one lamp on. Someone sits at the table with a laptop and a notepad, beside an empty chair. Papers are scattered around her. Biscuit the dog lies still underneath.
+
+## fill-it
+Add what they'll need to find. | A little at a time. | A few minutes, now and then, is enough. And afterbox notices the things you'd forget. | Accounts | Connect your bank. We'll notice what you'd forget. | Your accounts | Your bank | Current account | Connected | Read-only. We never ask for passwords, PINs or card numbers. | We noticed a monthly payment to an insurer. Is that a life policy? | £38.50, on the 1st of each month | Add it | Not mine | Added. | One less thing for them to search for. | Pensions and policies | Old pensions, quiet policies. Nothing left for them to chase. | Pension | For | Mary | From your first job | Who it's with, and the reference they'll ask for. | Policy | For | Jo | Home insurance | Who to call, and where the papers are kept. | Added. | Mary won't have to guess. | Crypto | Tell them where to look, so it still reaches them. | Crypto wallet | For | Jo | Where the key lives. Never the key itself. | Where to look | The blue tin, top shelf of the study. | Added. | Kept safe for Jo. | Wishes | And the small things only you'd think of. | A wish | What happens to Biscuit? | Your answer | He goes to Mum's. Long walks, no cheese. | Added. | Biscuit's looked after, too. | We noticed a monthly payment to an insurer. Is that a life policy? | £38.50, on the 1st of each month | Add it | Not mine | Pension | For | Mary | From your first job | Who it's with, and the reference they'll ask for. | Policy | For | Jo | Home insurance | Who to call, and where the papers are kept. | Crypto wallet | For | Jo | Where the key lives. Never the key itself. | Where to look | The blue tin, top shelf of the study. | A wish | What happens to Biscuit? | Your answer | He goes to Mum's. Long walks, no cheese. | Added. | One less thing for them to search for. | Added. | Mary won't have to guess. | Added. | Kept safe for Jo. | Added. | Biscuit's looked after, too. | And the things only you can say…
+[aria-label] An open box with a gold ribbon, and Biscuit the dog lying beside it. A ring grows around the box each time something is added.
+
+## say-it
+Say what only you can say. | In your voice, to exactly the right person. | A letter, a voice note, a video. Each one is sealed, and waits for the day it's meant for. | Write it once. It'll be there on the day. | Letter | For Mary, on her 18th birthday | Mary, | Eighteen | today. | How | did | that | happen? | The | practical | things | are | all | in | the | box. | This | is | the | part | that | isn't | practical: | I'm | so | proud | of | you. | I | always | was. | Love, | Dad | x | Sealed until then. Only Mary will open it. | Or just talk. They'll know it's you. | Voice note | For Jo, for when the house feels quiet | Recording | Kept for Jo | 0:42 | Or let them see you say it. | Video | For Mum | Recording | Kept for Mum | 1:48 | Kept with everything else they'll need, until the day they need it.
+[aria-label] Mary by the door frame where her height is marked in pencil: a small child, then ten, then a teenager.
+[aria-label] The open box with its gold ribbon. The three envelopes beside it slide in, one by one, and the lid begins to close.
+
+## sealed
+Sealed. | Even from us. | What you put in for them stays private. Nobody can read it while you're alive. Not us, not anyone. | The key is split in three. | One piece each. It only opens when all three come together, for the people you named. | Your executor | Jo, the person you chose. | A verified death certificate | Checked before anything opens. | afterbox | Our piece opens nothing alone. | None can open it alone. | Our promises | Not even afterbox can open your vault. | We never sell your data. | We never ask for passwords, PINs or card numbers.
+[aria-label] The box, closed. Its lid comes down the last of the way and the gold ribbon ties itself in a bow. A new ring begins to grow around it.
+
+## grows-with-you
+It grows with you. | A new home, a birthday, a new job. When life changes, afterbox asks gently, so what you've left for them is never out of date. | 2026 | 2028 | afterbox noticed | You bought a home. Add it? | Add it | Not now | 2030 | Yearly check-in | 18 | things kept. All up to date. | 2032 | afterbox noticed | Mary turns 10 this year. Record something new for her? | Record | Later | 2034 | Yearly check-in | 26 | things kept. All up to date. | 2036 | afterbox noticed | A new payment to a pension provider. Is that yours? | Yes, add it | Not mine | Biscuit the dog grows up alongside: a puppy in | 2026 | , grey round the muzzle by 2034. | And one day…
+
+
+## when-the-time-comes
+When the time comes, it opens for them. | Sealed until it's needed. Then everyone you named hears from us, gently, and sees only what you left for them. | From afterbox, for Mary | Mary, your dad left something for you. It's here whenever you're ready. | And Jo knows where to start. | The person you chose to sort things out gets a calm guide: what to do first, the letters already written, and nothing to work out alone. | afterbox | For Jo | We're so sorry. We'll take this one step at a time. | 3 of 12 done. Nothing else is urgent today. | Letters, already written | To the bank | Sent | To the pension provider | Ready | To the home insurer | Ready | Read the next letter | That's enough for today | Already lost someone? We can help now.
+[aria-label] Years later. Mary, grown up, stands by the box in the hall. Biscuit, old now, rests by the door. The lid lifts, slowly, and her letter rises out.
+[aria-label] Jo's guide, on a phone
+
+## family-support
+For families, right now. | Even if the person you lost never used afterbox, we'll help you find what they had and settle it, one step at a time. | Get help now | We guide you. We don't give legal or financial advice. | Where do I find Dad's pension? | Where do I find Dad's pension? | Start here. We'll help you trace it in three steps. | Who do I need to tell first? | Who do I need to tell first? | Only a few people this week. We'll show you who, and write the letters with you. | What if we can't find a will? | What if we can't find a will? | That happens more often than you'd think. We'll show you where to look, one place at a time. | Get help now | We guide you. We don't give legal or financial advice.
+
+
+## for-organisations
+Give it to your people. | Employers, insurers and banks can offer afterbox to the people they look after: as a benefit, or inside their own app. | Employers | Insurers | Banks | A gift to your team, and the people they love. | Give everyone who works for you a place to gather what their family would need to find. | It's theirs to keep building, whatever happens next. | Partner logo | · | powered by | afterbox | A gift from | your company | to you and the people you love. | Open your gift | The welcome someone on your team sees. | Fewer unclaimed policies. Families who know what they have. | Your policyholders note where their policy lives, so the people they love can find it. | When the time comes, the family knows to come to you. | Partner logo | · | powered by | afterbox | Your life policy | Jo will know where to find it. | Keep it for Jo | The top of a policyholder's page. | A caring feature for your customers and their families. | Offer it inside your own app, under your own name. | Your customers build it over the years; their families are looked after when it matters. | Partner logo | · | powered by | afterbox | For the people you love most. | What they'd need, kept together. | Start with one thing | A screen in your own app. | Talk to us
+[aria-label] Who it's for
+
+## final-scene
+bought a home | Mary is born | a new job | Mary turns 10 | bought a home | Mary is born | a new job | Mary turns 10 | Mary, everything you'll need | is in here. | You won't have to guess. | Love, Dad x | Start building it for them. | Begin with someone you love
+[aria-label] The same house, at night. Every light is on. Biscuit, old now, lies on the doorstep.
+
+## footer
+afterbox | Our promises | Not even afterbox can open your vault. | We never sell your data. | We never ask for passwords, PINs or card numbers. | How it works | For families | For organisations | Privacy | Terms | We guide you. We don't give legal or financial advice. | © 2026 afterbox
+[aria-label] afterbox, home
+[aria-label] Footer
+
+# /family-support
+
+## main
+afterbox | We're so sorry. We'll take this one step at a time. | Family support isn't open yet. When it is, this is where you'll start: with one small step, and someone to guide you through the rest. | We guide you. We don't give legal or financial advice. | Back to afterbox
+[aria-label] afterbox, home
+
+# /privacy
+
+## main
+afterbox | Privacy | Our full privacy notice will be here before afterbox opens. Until then, the promises it will keep: | Not even afterbox can open your vault. | We never sell your data. | We never ask for passwords, PINs or card numbers. | Back to afterbox
+[aria-label] afterbox, home
+
+# /terms
+
+## main
+afterbox | Terms | Our terms will be here before afterbox opens, in plain words. | We guide you. We don't give legal or financial advice. | Back to afterbox
+[aria-label] afterbox, home
+
+# /start
+
+## main
+afterbox | Who will you build it for? | Think of someone you love. Soon you'll be able to start gathering what they'll need, and what you want them to hear, one small piece at a time. | Back to the start of the story
+[aria-label] afterbox, home

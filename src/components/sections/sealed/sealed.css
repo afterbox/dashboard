@@ -1,0 +1,277 @@
+/*
+  Section 5, "Sealed. Even from us.": the box, the key, and where they sit.
+
+  Everything here is a state change, not a flourish: `ease-state`, short, in
+  order, and nothing overshoots. The scene is told what has happened, and CSS
+  moves the parts:
+    data-sealed    on the box scene: the lid is down and the ribbon is tied
+    data-growing   on the box scene: the next ring has started to grow
+    data-key       on the key: 0 not there, 1 whole, 2 split, 3 a piece with each holder
+  Scrolling back up undoes each, at once.
+  Reduced motion: sealed, tied and held from the first paint.
+
+  It also sets what the layout reads:
+    --se-box  stacked: the height of the box scene, the same as at the end of
+              section 4 (--si-box), so the box is where that section left it
+    --se-h    beside: the height of the box panel
+    --se-top  beside: where the panel sticks
+
+  The two media queries match the `beside` and `low` variants in globals.css.
+*/
+
+.sealed {
+  --se-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 16);
+  --se-box: min(max(34svh, 12rem), 70vw);
+}
+
+@media (width >= 48rem) {
+  .sealed {
+    --se-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 18);
+  }
+}
+
+@media (orientation: landscape), (width >= 64rem) {
+  .sealed {
+    --se-gap: calc(var(--spacing) * 6);
+    --se-h: min(100svh - var(--se-nav) - 2 * var(--se-gap), 45rem);
+    --se-top: calc(var(--se-nav) + (100svh - var(--se-nav) - var(--se-h)) / 2);
+  }
+}
+
+@media (orientation: landscape) and (height < 600px) {
+  .sealed {
+    --se-gap: calc(var(--spacing) * 3);
+  }
+}
+
+/*
+  The board (400 × 280; see ../box/SealedBoxArt.tsx), placed in the space the
+  scene has. Which way depends on the shape of that space.
+
+  A wide strip: the board stands on the bottom edge, as tall as the strip,
+  exactly as at the end of section 4 (.say-board). The rings rise over the box
+  and are cut off below it.
+
+  A tall panel: the rings are whole. The board is as wide as the panel, which
+  is the width of the next ring (radius 200), and the middle of the box
+  (67.5% across, 70.7% down the board) sits on the middle of the panel.
+*/
+.sealed-board {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  height: 100%;
+  aspect-ratio: 400 / 280;
+  translate: -52% 0;
+}
+
+@container sealed (aspect-ratio < 1.15) {
+  .sealed-board {
+    top: 50%;
+    bottom: auto;
+    width: min(96cqw, 96cqh);
+    height: auto;
+    translate: -67.5% -70.7%;
+  }
+}
+
+/* The lid comes down the last of the way, and stops. Section 4 left it 14° open. */
+.sealed-scene [data-part="box-lid"] {
+  rotate: -14deg;
+  transition: rotate 520ms var(--ease-state);
+}
+.sealed-scene[data-sealed] [data-part="box-lid"] {
+  rotate: 0deg;
+}
+
+/* The click: the whole box is pressed down by the lid, a pixel or so, and comes back. Once. */
+@keyframes sealed-click {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  40% {
+    translate: 0 1.5px;
+  }
+}
+.sealed-scene[data-sealed] [data-part="box"] {
+  animation: sealed-click 180ms var(--ease-state) 500ms 1;
+}
+
+/* The ribbon ties itself: the knot, then one loop, then the other, each out of the knot. */
+.sealed-scene [data-part="bow-knot"],
+.sealed-scene [data-part="bow-loop"] {
+  scale: 0;
+  transition: scale 300ms var(--ease-state);
+}
+.sealed-scene[data-sealed] [data-part="bow-knot"],
+.sealed-scene[data-sealed] [data-part="bow-loop"] {
+  scale: 1;
+}
+.sealed-scene[data-sealed] [data-part="bow-knot"] {
+  transition-delay: 700ms;
+}
+.sealed-scene[data-sealed] [data-part="bow-loop"] {
+  transition-delay: 880ms;
+}
+.sealed-scene[data-sealed] [data-part="bow-loop"] + [data-part="bow-loop"] {
+  transition-delay: 1060ms;
+}
+
+/* Time passing: once it is sealed and still, the next ring starts to grow. Slowly. */
+.sealed-ring-next {
+  opacity: 0;
+  scale: 0.88;
+  transition:
+    scale 1400ms var(--ease-gift),
+    opacity 480ms var(--ease-state);
+}
+[data-growing] .sealed-ring-next {
+  opacity: 1;
+  scale: 1;
+}
+
+/*
+  The key and its three holders.
+
+  Each piece's home is its holder. Until it gets there it is moved back to
+  where it sits in the whole key (--dx, --dy), and when the key splits, a
+  little apart from the others (--gx, --gy). Every piece says which it is
+  (--i: 0, 1, 2); --o is how far it is from the middle one (-1, 0, 1).
+
+  A phone: the holders are three rows, and the key stands upright over them.
+  It comes apart top to bottom.
+*/
+.sealed-key {
+  container: key / inline-size;
+}
+
+.sealed-holders {
+  /* A piece: how long it is along the key, and how thick. */
+  --pw: 3rem;
+  --ph: 1.875rem;
+  /* A holder's slot, and the row it sits in. */
+  --slot-w: 4.5rem;
+  --slot-h: 4.5rem;
+  --row: 5.5rem;
+  --g: 0.75rem;
+  /* The room the whole key has, above the holders, and the middle of it. */
+  --room: 10.5rem;
+  --key-y: calc((var(--room) - 1.5rem) / 2);
+  display: grid;
+  gap: var(--g);
+  padding-top: var(--room);
+}
+
+.sealed-holder {
+  --o: calc(var(--i) - 1);
+  display: grid;
+  grid-template-columns: var(--slot-w) 1fr;
+  align-items: center;
+  column-gap: 1rem;
+  height: var(--row);
+}
+
+.sealed-slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--slot-w);
+  height: var(--slot-h);
+}
+
+.sealed-piece {
+  --dx: calc(50cqw - var(--slot-w) / 2);
+  --dy: calc(
+    var(--key-y) - var(--room) - var(--row) / 2 + var(--o) * var(--pw) - var(--i) * (var(--row) + var(--g))
+  );
+  --gx: 0rem;
+  --gy: calc(var(--o) * 0.625rem);
+  width: var(--pw);
+  height: var(--ph);
+  rotate: 90deg;
+  translate: var(--dx) var(--dy);
+  opacity: 0;
+  transition:
+    translate 640ms var(--ease-state),
+    opacity 200ms var(--ease-state);
+}
+
+/* A wide column: the holders are side by side, and the key lies on its side over them. */
+@container key (width >= 30rem) {
+  .sealed-holders {
+    --pw: 4.5rem;
+    --ph: 2.8125rem;
+    --slot-w: 6.5rem;
+    --slot-h: 4.5rem;
+    --g: 1.5rem;
+    --room: 6.5rem;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .sealed-holder {
+    display: block;
+    height: auto;
+  }
+
+  .sealed-piece {
+    --dx: calc(50cqw + var(--o) * var(--pw) - var(--i) * (100cqw + var(--g)) / 3 - var(--slot-w) / 2);
+    --dy: calc(var(--key-y) - var(--room) - var(--slot-h) / 2);
+    --gx: calc(var(--o) * 0.75rem);
+    --gy: 0rem;
+    rotate: none;
+  }
+}
+
+.sealed-key[data-key="1"] .sealed-piece {
+  opacity: 1;
+}
+.sealed-key[data-key="2"] .sealed-piece {
+  opacity: 1;
+  translate: calc(var(--dx) + var(--gx)) calc(var(--dy) + var(--gy));
+  transition-duration: 260ms, 200ms;
+}
+.sealed-key[data-key="3"] .sealed-piece {
+  opacity: 1;
+  translate: 0 0;
+  transition-delay: calc(var(--i) * 140ms);
+}
+
+/* A holder closes on its piece as it arrives, and the line under them all follows. */
+.sealed-lock,
+.sealed-alone {
+  opacity: 0;
+  transition: opacity 200ms var(--ease-state);
+}
+.sealed-key[data-key="3"] .sealed-lock {
+  opacity: 1;
+  transition-delay: calc(640ms + var(--i) * 140ms);
+}
+.sealed-key[data-key="3"] .sealed-alone {
+  opacity: 1;
+  transition-duration: 480ms;
+  transition-delay: 1100ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sealed-scene [data-part="box-lid"] {
+    rotate: 0deg;
+  }
+  .sealed-scene [data-part="bow-knot"],
+  .sealed-scene [data-part="bow-loop"],
+  .sealed-ring-next {
+    scale: 1;
+    opacity: 1;
+  }
+  .sealed-scene [data-part="box"] {
+    animation: none !important;
+  }
+  .sealed-piece {
+    translate: 0 0 !important;
+    opacity: 1 !important;
+  }
+  .sealed-lock,
+  .sealed-alone {
+    opacity: 1 !important;
+  }
+}
