@@ -13,7 +13,7 @@ bought a home | Mary is born | a new job | Mary turns 10 | bought a home | Mary 
 [aria-label] A street at dusk. One house has a lit window. Inside, a family sits at the kitchen table, with Biscuit the dog asleep underneath.
 
 ## kitchen-table
-Picture the person you love most, three days after losing you. | Sitting at the kitchen table, not knowing where to begin. | They search. They guess. They miss things. | Did he have life insurance? | Did he have life insurance? | Which pension was from his first job? | Where did he keep the keys to his crypto wallet? | What did he want for his funeral? | About 400 hours of admin | £15B in unclaimed UK assets | It doesn't have to be this way.
+Picture the person you love most, three days after losing you. | Sitting at the kitchen table, not knowing where to begin. | They search. They guess. They miss things. | Did he have life insurance? | Did he have life insurance? | Which pension was from his first job? | Where did he keep the keys to his crypto wallet? | What did he want for his funeral? | About 400 hours of admin work | £15B in unclaimed UK assets | It doesn't have to be this way.
 [aria-label] The same kitchen, at night, with one lamp on. Someone sits at the table with a laptop and a notepad, beside an empty chair. Papers are scattered around her. Biscuit the dog lies still underneath.
 
 ## fill-it

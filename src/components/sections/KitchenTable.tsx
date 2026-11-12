@@ -5,7 +5,7 @@ import { KitchenStage, SearchBar } from "./lazy";
 import "./kitchen-table/kitchen-table.css";
 
 /** The two facts. */
-const facts = ["About 400 hours of admin", "£15B in unclaimed UK assets"] as const;
+const facts = ["About 400 hours of admin work", "£15B in unclaimed UK assets"] as const;
 
 // One beat of the story. Beside the scene, each is given most of a screen and sits in the middle of it.
 const beat = "beside:flex beside:min-h-[72svh] beside:flex-col beside:justify-center";
