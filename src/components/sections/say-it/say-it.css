@@ -3,10 +3,11 @@
 
   Everything here follows the scroll through a number (see ./use-scroll-share.ts),
   and is opacity and transform only:
-    --ink  how many words of the letter are written
-    --rec  how many bars of the voice note are recorded
-  Reduced motion: the letter is written and the voice note recorded from the
-  first paint.
+    --ink   how many words of the letter are written
+    --rec   how many bars of the voice note are recorded
+    --take  how much of the video is recorded, 0 to 1
+  Reduced motion: the letter is written, and the voice note and the video
+  recorded, from the first paint.
 
   It also sets what the layout reads:
     --si-box  the height of the box scene at the end
@@ -49,6 +50,16 @@
   scale: 1 calc(0.07 + (var(--h) - 0.07) * clamp(0, var(--rec) - var(--i), 1));
 }
 
+/* The video. The line under the picture fills from the left as it records. */
+.say-film {
+  --take: 0;
+}
+
+.say-take {
+  scale: var(--take) 1;
+  transform-origin: left;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .say-letter {
     --ink: 999 !important;
@@ -56,6 +67,10 @@
 
   .say-wave {
     --rec: 999 !important;
+  }
+
+  .say-film {
+    --take: 1 !important;
   }
 }
 

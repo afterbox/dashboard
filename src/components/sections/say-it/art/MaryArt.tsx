@@ -16,9 +16,8 @@ import { Person } from "../../hero/art/TableArt";
  *   mary-mark                  a pencil mark on the door frame, one per age
  *
  * The story moves them, not the clock: the panel she is in is marked
- * `data-grown` once Dad's letters have arrived, and she grows up as they
- * settle, one slow fade at a time (opacity only). Scrolling back takes her
- * back. Reduced motion: she is 15 from the first paint.
+ * `data-grown` once it is on screen, and she grows up there, one slow fade
+ * at a time (opacity only). Scrolling back takes her back. Reduced motion: she is 15 from the first paint.
  */
 const floor = 196;
 const x = 150;
@@ -26,7 +25,7 @@ const x = 150;
 /** How long one age takes to give way to the next: slower than anything else on the page so far. */
 const fade = "transition-opacity duration-1800 ease-gift";
 
-/** When each change starts, once the letters begin to arrive. */
+/** When each change starts, once she is on screen. */
 const toTen = "delay-500";
 const toFifteen = "delay-2000";
 

@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { usePrefersReducedMotion } from "@/lib/use-prefers-reduced-motion";
 import { Kind, paper, Tick } from "../fill-it/cards";
-import { Envelopes } from "./Envelopes";
 import { useIntoTheBox } from "./into-the-box";
-import { clock, voiceLength } from "./messages";
-import { barsNeeded, inkNeeded, LetterLines, Wave } from "./previews";
+import { clock, videoLength, voiceLength } from "./messages";
+import { barsNeeded, inkNeeded, LetterLines, VideoStill, Wave } from "./previews";
 import { useSayLife } from "./say-life";
 import { useArrived, useScrollShare } from "./use-scroll-share";
 import "../box/box-scene.css";
@@ -24,50 +23,120 @@ type Props = {
 /** The box as section 3 left it: four rings, everything in. Nothing is added here, so nothing grows or bounces. */
 const full = { "--caught": 4, "--items": 5 } as CSSProperties;
 
+/** Where a card's top edge is, down the screen, when its message starts being made and when it is done. */
+const making = [0.86, 0.36] as const;
+const writing = [0.86, 0.3] as const;
+
+const write = (share: number, el: HTMLElement) => el.style.setProperty("--ink", (share * inkNeeded).toFixed(2));
+const unwrite = (el: HTMLElement) => el.style.removeProperty("--ink");
+
 /**
- * Section 4, top to bottom. Nothing is pinned; each part plays as it is
- * scrolled into, and scrolling back up undoes it.
+ * A recording that follows the scroll: as its card comes up the screen, a
+ * number on the card (`name`) rises from 0 to `whole`, and the counter runs
+ * from nothing to `length` seconds. ./say-it.css draws the number.
+ * Reduced motion: already recorded.
+ */
+function useRecording(
+  card: RefObject<HTMLElement | null>,
+  name: string,
+  whole: number,
+  length: number,
+  reduced: boolean,
+) {
+  const [counted, setCounted] = useState(0);
+  const show = useCallback(
+    (share: number, el: HTMLElement) => {
+      el.style.setProperty(name, (share * whole).toFixed(2));
+      setCounted(Math.round(share * length));
+    },
+    [name, whole, length],
+  );
+  const clear = useCallback((el: HTMLElement) => el.style.removeProperty(name), [name]);
+  useScrollShare(card, making, show, !reduced, clear);
+
+  return reduced ? length : counted;
+}
+
+type TakeProps = {
+  /** How far the recording has got, and how long it runs, in seconds. */
+  seconds: number;
+  length: number;
+  /** What it says once it is done. */
+  kept: string;
+};
+
+/** Under a recording: that it is recording, then that it is kept; and the counter. */
+function Take({ seconds, length, kept }: TakeProps) {
+  const done = seconds === length;
+  return (
+    <div className="mt-4 flex items-center justify-between gap-4 text-small text-ink-muted">
+      {/* One line at a time, as under the box in section 3. */}
+      <p className="grid">
+        <span
+          aria-hidden={done}
+          className={`inline-flex items-center gap-2 transition-opacity duration-480 ease-gift [grid-area:1/1] ${
+            done ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <span aria-hidden className="size-2 rounded-pill bg-heartwood" />
+          Recording
+        </span>
+        <span
+          aria-hidden={!done}
+          className={`inline-flex items-center gap-1 text-sage transition-opacity duration-480 ease-gift [grid-area:1/1] ${
+            done ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <Tick />
+          {kept}
+        </span>
+      </p>
+      <p className="tabular-nums">{clock(seconds)}</p>
+    </div>
+  );
+}
+
+/** Who a message is for, and when, in Dad's hand: what he would write on the envelope. */
+function Address({ children }: { children: ReactNode }) {
+  return <p className="mt-2 font-note text-note text-balance text-ink">{children}</p>;
+}
+
+const heading = "font-display max-w-md text-display-s-mobile text-balance text-ink md:text-display-s";
+
+/**
+ * Section 4, top to bottom. Nothing is pinned and nothing needs pressing;
+ * each part plays as it is scrolled into, and scrolling back up undoes it.
  *
- *   the words, and Mary     she grows up as the envelopes arrive
- *   the three envelopes     slide in and settle (./Envelopes.tsx)
- *   the letter              writes itself as it comes up the screen
- *   the voice note          records as it comes up the screen, then breathes
- *   the box                 the letters slide into it, and the lid begins to close
+ *   the words, and Mary   she grows up, once, as she comes into view
+ *   the letter            writes itself as it comes up the screen
+ *   the voice note        records as it comes up the screen, then breathes
+ *   the video             records as it comes up the screen
+ *   the box               three letters slide into it, and the lid begins to close
+ *
+ * Each of the three is addressed in Dad's handwriting, as on an envelope.
+ * Wide screens: they step down the page, left, right, left. A phone: one
+ * under another.
  *
  * Slow paper: `ease-gift` and a soft spring, never `ease-play`; no glow.
  * Reduced motion: the last frame of each, from the first paint.
  */
 export function SayStage({ mary, rings, back, front }: Props) {
   const section = useRef<HTMLDivElement>(null);
-  const row = useRef<HTMLOListElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const letter = useRef<HTMLDivElement>(null);
   const voice = useRef<HTMLDivElement>(null);
+  const video = useRef<HTMLDivElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
 
-  const arrived = useArrived(row);
+  // Mary grows up once most of her panel is on screen.
+  const grown = useArrived(panel, 0.3);
 
-  // The letter: the ink follows the scroll.
-  const write = useCallback((share: number) => {
-    letter.current?.style.setProperty("--ink", (share * inkNeeded).toFixed(2));
-  }, []);
-  const unwrite = useCallback(() => {
-    letter.current?.style.removeProperty("--ink");
-  }, []);
-  useScrollShare(letter, [0.86, 0.3], write, !reduced, unwrite);
+  // The letter: the ink follows the scroll. It has more to get through than a recording, so it is given a little longer.
+  useScrollShare(letter, writing, write, !reduced, unwrite);
 
-  // The voice note: the bars and the counter follow the scroll.
-  const [counted, setCounted] = useState(0);
-  const record = useCallback((share: number) => {
-    voice.current?.style.setProperty("--rec", (share * barsNeeded).toFixed(2));
-    setCounted(Math.round(share * voiceLength));
-  }, []);
-  const unrecord = useCallback(() => {
-    voice.current?.style.removeProperty("--rec");
-  }, []);
-  useScrollShare(voice, [0.86, 0.36], record, !reduced, unrecord);
-  const seconds = reduced ? voiceLength : counted;
-  const kept = seconds === voiceLength;
+  const spoken = useRecording(voice, "--rec", barsNeeded, voiceLength, reduced);
+  const filmed = useRecording(video, "--take", 1, videoLength, reduced);
 
   useIntoTheBox(box, !reduced);
   useSayLife(section, !reduced);
@@ -91,66 +160,53 @@ export function SayStage({ mary, rings, back, front }: Props) {
         </div>
 
         <div
+          ref={panel}
           role="img"
           aria-label="Mary by the door frame where her height is marked in pencil: a small child, then ten, then a teenager."
-          data-grown={reduced || arrived ? "" : undefined}
+          data-grown={reduced || grown ? "" : undefined}
           className="group/mary relative mt-10 aspect-4/3 max-h-[38svh] w-full overflow-hidden rounded-xl border border-line bg-paper md:col-span-4 md:col-start-9 md:mt-0 md:max-h-none"
         >
           {mary}
         </div>
       </div>
 
-      <Envelopes row={row} arrived={arrived} />
-
       <div className="mt-20 grid gap-y-16 md:mt-28 md:grid-cols-12 md:gap-x-6 low:mt-16">
         <div className="md:col-span-6">
-          <h3 className="font-display max-w-md text-display-s-mobile text-balance text-ink md:text-display-s">
-            Write it once. It&apos;ll be there on the day.
-          </h3>
+          <h3 className={heading}>Write it once. It&apos;ll be there on the day.</h3>
           <div ref={letter} className={`say-letter mt-6 max-w-120 ${paper}`}>
-            <Kind who="Mary">Letter</Kind>
-            <div className="mt-4">
+            <Kind>Letter</Kind>
+            <Address>For Mary, on her 18th birthday</Address>
+            <div className="mt-4 border-t border-line pt-4">
               <LetterLines />
             </div>
-            <p className="mt-5 border-t border-line pt-3 text-small text-ink-muted">Sealed until her 18th birthday.</p>
+            <p className="mt-5 border-t border-line pt-3 text-small text-ink-muted">
+              Sealed until then. Only Mary will open it.
+            </p>
           </div>
         </div>
 
-        {/* Set lower than the letter on a wide screen: one, then the other. */}
+        {/* Set lower than the letter on a wide screen: one, then the next. */}
         <div className="md:col-span-5 md:col-start-8 md:mt-44 low:mt-24">
-          <h3 className="font-display max-w-md text-display-s-mobile text-balance text-ink md:text-display-s">
-            Or just talk. They&apos;ll know it&apos;s you.
-          </h3>
+          <h3 className={heading}>Or just talk. They&apos;ll know it&apos;s you.</h3>
           <div ref={voice} className={`say-wave mt-6 max-w-120 ${paper}`}>
-            <Kind who="Jo">Voice note</Kind>
-            <p className="mt-2 font-note text-note text-balance text-ink">For when the house feels quiet</p>
+            <Kind>Voice note</Kind>
+            <Address>For Jo, for when the house feels quiet</Address>
             <div className="mt-5">
               <Wave />
             </div>
-            <div className="mt-4 flex items-center justify-between gap-4 text-small text-ink-muted">
-              {/* One line at a time, as under the box in section 3. */}
-              <p className="grid">
-                <span
-                  aria-hidden={kept}
-                  className={`inline-flex items-center gap-2 transition-opacity duration-480 ease-gift [grid-area:1/1] ${
-                    kept ? "opacity-0" : "opacity-100"
-                  }`}
-                >
-                  <span aria-hidden className="size-2 rounded-pill bg-heartwood" />
-                  Recording
-                </span>
-                <span
-                  aria-hidden={!kept}
-                  className={`inline-flex items-center gap-1 text-sage transition-opacity duration-480 ease-gift [grid-area:1/1] ${
-                    kept ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  <Tick />
-                  Kept for Jo
-                </span>
-              </p>
-              <p className="tabular-nums">{clock(seconds)}</p>
+            <Take seconds={spoken} length={voiceLength} kept="Kept for Jo" />
+          </div>
+        </div>
+
+        <div className="md:col-span-5 md:col-start-2">
+          <h3 className={heading}>Or let them see you say it.</h3>
+          <div ref={video} className={`say-film mt-6 max-w-120 ${paper}`}>
+            <Kind>Video</Kind>
+            <Address>For Mum</Address>
+            <div className="mt-4">
+              <VideoStill ready={filmed === videoLength} />
             </div>
+            <Take seconds={filmed} length={videoLength} kept="Kept for Mum" />
           </div>
         </div>
       </div>

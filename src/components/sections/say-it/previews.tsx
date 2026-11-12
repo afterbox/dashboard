@@ -2,12 +2,12 @@ import { Fragment, type CSSProperties } from "react";
 import { letter } from "./messages";
 
 /**
- * What is inside each of Dad's three messages, as afterbox will show it. The
- * page shows the letter and the voice note being made (./SayStage.tsx); the
- * sheet shows each one finished (./Envelopes.tsx). Same pieces, both places.
+ * What is inside each of Dad's three messages, as afterbox will show it: the
+ * letter, the voice note and the video, each being made as its card comes up
+ * the screen (./SayStage.tsx).
  *
- * ./say-it.css moves them: the page says how far the ink (`--ink`) and the
- * recording (`--rec`) have got, on whatever holds them.
+ * ./say-it.css moves them: the card says how far the ink (`--ink`), the voice
+ * (`--rec`) and the film (`--take`) have got.
  */
 
 /** The pen lifts at the end of a line: that many words' worth of nothing. */
@@ -88,15 +88,30 @@ export function Wave() {
   );
 }
 
-/** PLACEHOLDER for a still from the video: a block, and the sign for "play". No face, no label. */
-export function VideoStill() {
+/**
+ * PLACEHOLDER for the video: a block where the picture will be, and under it
+ * the line that fills as it records. No face, no label. Inside something
+ * marked `say-film`, the line follows `--take`. Once it is `ready`, the sign
+ * for "play" fades in: it's there to be watched.
+ */
+export function VideoStill({ ready }: { ready: boolean }) {
   return (
-    <div className="relative grid aspect-video place-items-center rounded-lg bg-keepsake">
-      <span className="grid size-14 place-items-center rounded-pill bg-paper">
-        <svg viewBox="0 0 24 24" aria-hidden className="size-6 translate-x-0.5 fill-ink">
-          <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" />
-        </svg>
-      </span>
-    </div>
+    <>
+      <div className="grid aspect-video place-items-center rounded-md bg-keepsake">
+        <span
+          aria-hidden
+          className={`grid size-14 place-items-center rounded-pill bg-paper transition-opacity duration-480 ease-gift motion-reduce:opacity-100! ${
+            ready ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <svg viewBox="0 0 24 24" className="size-6 translate-x-0.5 fill-ink">
+            <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" />
+          </svg>
+        </span>
+      </div>
+      <div aria-hidden className="mt-4 h-1 overflow-hidden rounded-pill bg-line">
+        <div data-part="take" className="say-take h-full rounded-pill bg-ink" />
+      </div>
+    </>
   );
 }

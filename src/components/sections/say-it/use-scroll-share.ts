@@ -18,11 +18,11 @@ const clamp = (n: number) => Math.min(1, Math.max(0, n));
 export function useScrollShare(
   target: RefObject<HTMLElement | null>,
   [from, to]: readonly [number, number],
-  /** Draw this share. Called on every change, so keep it to styles; it must be the same function each render. */
-  show: (share: number) => void,
+  /** Draw this share on the thing. Called on every change, so keep it light; it must be the same function each render. */
+  show: (share: number, el: HTMLElement) => void,
   enabled: boolean,
   /** Put back whatever `show` changed. */
-  clear?: () => void,
+  clear?: (el: HTMLElement) => void,
 ) {
   const scrolled = useMotionValue(0);
   const share = useSpring(scrolled, { stiffness: 70, damping: 22, restDelta: 0.0005 });
@@ -53,8 +53,8 @@ export function useScrollShare(
     watcher.observe(el);
     window.addEventListener("scroll", follow, { passive: true });
     window.addEventListener("resize", queue);
-    const stop = share.on("change", show);
-    show(share.get());
+    const stop = share.on("change", (now) => show(now, el));
+    show(share.get(), el);
 
     return () => {
       watcher.disconnect();
@@ -62,7 +62,7 @@ export function useScrollShare(
       window.removeEventListener("resize", queue);
       cancelAnimationFrame(frame);
       stop();
-      clear?.();
+      clear?.(el);
     };
   }, [target, from, to, show, enabled, clear, scrolled, share]);
 }

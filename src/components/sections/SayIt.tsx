@@ -5,11 +5,13 @@ import { SayStage } from "./say-it/SayStage";
 /**
  * 4. "Say it, for later": the messages. The emotional core of the page.
  *
- * A blush band. Dad has written three envelopes, in his own hand: for Mary on
- * her 18th birthday, for Jo for when the house feels quiet, and for Mum. Mary
- * grows up as they arrive. A letter writes itself; a voice note records. Then
- * the envelopes slide into the box from section 3, and the lid begins to
- * close: section 5 finishes closing it and ties the ribbon.
+ * A blush band. Dad has left three things, each addressed in his own hand: a
+ * letter for Mary on her 18th birthday, a voice note for Jo for when the
+ * house feels quiet, and a video for Mum. Mary grows up beside the words. The
+ * letter writes itself, and the voice note and the video record, as each
+ * comes up the screen; nothing needs pressing. Then three envelopes slide
+ * into the box from section 3, and the lid begins to close: section 5
+ * finishes closing it and ties the ribbon.
  *
  * Gift mode at its quietest. After the bounce of section 3, nothing here
  * bounces or glows: paper slides and settles (`ease-gift`), ink appears, the
@@ -19,7 +21,7 @@ import { SayStage } from "./say-it/SayStage";
  */
 export function SayIt() {
   return (
-    // Clipped at the sides only: the envelopes slide in from off the edge.
+    // Clipped at the sides only: the box's rings run wider than a phone.
     <section data-section="say-it" aria-labelledby="say-it-line" className="overflow-x-clip bg-blush">
       <SayStage mary={<MaryArt />} rings={<BoxRings />} back={<BoxBack letters />} front={<BoxFront />} />
     </section>

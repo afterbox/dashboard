@@ -195,7 +195,7 @@ One board, 320 × 240, with the floor at y 196. Mary stands in one place, by a d
 | `mary-4`, `mary-10`, `mary-15` | Mary at each age, standing. Each holds a `person` (with `person-head` and `person-eyes`, as in the zoom scene). | Fades in and out; breathes and blinks. | As `person`. |
 | `mary-mark` | A pencil mark on the door frame at the top of her head. **One group each**; three. | Fades in as she reaches that height. | None |
 
-The envelopes themselves (front: a stamp, a postmark, room for a handwritten address in the lower half), the waveform of the voice note and the still from the video are placeholders too; we set the handwriting in type.
+The waveform of the voice note and the still from the video are placeholders too. The handwritten addresses ("For Mary, on her 18th birthday") are set in type on the cards, not drawn.
 
 ## Deliverables
 

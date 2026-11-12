@@ -76,8 +76,8 @@ Each section lists: **what it says**, **what you should feel**, **what happens**
 ### 4. "Say it, for later" (the emotional core)
 - **Says:** record a video, a voice note or a letter, and give each one to exactly the right person.
 - **Feel:** tenderness; a lump in the throat.
-- **What happens:** a `blush` band. Three envelopes are addressed in handwriting: *For Mary, on her 18th birthday* · *For Jo, for when the house feels quiet* · *For Mum.* A voice-note waveform records; a short letter writes itself. Mary grows up through the illustrations as the envelopes move (child → teenager).
-- **Mobile:** the envelopes are a swipeable stack; tapping one opens the message preview in a bottom sheet.
+- **What happens:** a `blush` band. Three messages, each addressed in handwriting: a letter, *For Mary, on her 18th birthday* · a voice note, *For Jo, for when the house feels quiet* · a video, *For Mum.* Each is a card that makes itself as you scroll to it: the letter writes itself, the voice-note waveform records, the video records. Nothing needs pressing. Mary grows up through the illustrations beside the opening words (child → teenager).
+- **Mobile:** the three cards sit one under another, and play the same way.
 - **Motion signature:** slow, unhurried (no bounce): paper sliding, ink appearing.
 - **Hand-off:** the envelopes slide into the box, and the lid begins to close.
 

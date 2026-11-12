@@ -24,10 +24,9 @@ export function Tick({ className = "" }: { className?: string }) {
 const people = {
   Jo: "bg-keepsake",
   Mary: "bg-lantern",
-  Mum: "bg-heartwood",
 } as const;
 
-export type Who = keyof typeof people;
+type Who = keyof typeof people;
 
 /** The top line of a card: what kind of thing it is, and who it is for. */
 export function Kind({ children, who }: { children: ReactNode; who?: Who }) {
