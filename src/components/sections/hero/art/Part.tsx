@@ -33,6 +33,12 @@ type Props = {
  *           biscuit (biscuit-body, biscuit-head, biscuit-ear, biscuit-tail)
  *           ball (not ambient: it falls once, see ../ball.ts)
  *
+ * Section 2 draws the same kitchen at night (../../kitchen-table/KitchenNightArt.tsx)
+ * and uses lamp-light, person (person-head) and biscuit (biscuit-body,
+ * biscuit-head) from the table, plus three of its own. person-body breathes;
+ * paper and box follow the scroll rather than the clock:
+ *   person-body · paper · box (box-papers)
+ *
  * docs/illustrator-brief.md lists every name with its pivot. Keep it in step.
  */
 export function Part({ name, pivot, who, perches, className, children }: Props) {

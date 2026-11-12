@@ -143,6 +143,30 @@ It flies in an arc about twice its own height, so leave clear sky above the roof
 - In portrait it stops close to the table leg, because a phone crops the sides of the room. Keep that spot inside the middle 620 of the board (x 140 to 760).
 - Biscuit sleeps through it.
 
+### The kitchen table at night (scene 3)
+
+The same room as the zoom scene, on the same two boards, with the table in the same place. Mary's mum sits where she sat (landscape x 1270 · portrait x 650) with a laptop and a notepad; Dad's chair (x 1025 · x 383) is empty. One lamp is on: the pendant. Colours are Keepsake and Linen only: no Lantern, no Heartwood. Quiet, not tragic: nobody is crying or in distress.
+
+We crop this scene to a panel around the table, so keep everything that matters inside these areas and let the wall and floor carry on past them as flat colour:
+
+| | Area that always shows |
+|---|---|
+| Landscape | x 798 to 1378, y 150 to 730 |
+| Portrait | x 140 to 760, y 120 to 1045 |
+
+| Group name | What it is | How it moves | Pivot |
+|---|---|---|---|
+| `lamp-light` | The pendant shade and its light, in one group. | Its brightness wavers very slightly. | None |
+| `person` | Mary's mum, seated: holds the two groups below. No separate eyes or hand here. | Stays where she is. | None |
+| `person-body` | Her body, from the shoulders down. | Breathes: the chest rises by about 4% and fills out a touch, in for two seconds, out for a little longer, then a short rest. | Where she sits: the bottom centre of the body. |
+| `person-head` | Head, hair, neck and face. | Rides up on the shoulders with each breath. | None |
+| `biscuit` | The dog, lying still under the table: holds `biscuit-body` and `biscuit-head` as above. No separate ear or tail. | Breathes. Nothing else. | As above. |
+| `paper` | One scattered sheet. **One group each**; seven on the placeholder (five on the table, two on the floor). | Lifts, straightens and flies into the box. | Its centre. |
+| `box` | The box from the hero, open, **without its ribbon**, standing on the table at Dad's place. | Fades in, then the papers fly into it. | None |
+| `box-papers` | Inside `box`: the top edges of the sheets, showing above the rim. | Fades in once the papers have landed. | None |
+
+Draw the front of the box last, so the sheets pass behind it as they drop in. Keep the table clear at Dad's place for the box, and keep clear air above it for the papers' flight.
+
 ## Deliverables
 
 1. Style exploration: two or three directions for Biscuit, the family and the box. We pick one before full production.

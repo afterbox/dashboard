@@ -165,6 +165,70 @@ export function liveBird(clock: Clock, bird: Piece) {
   });
 }
 
+/** Someone sitting: a rise of one part in a hundred, every 3 to 4 seconds. Nothing else. */
+function breathe(clock: Clock, person: Piece) {
+  sway(clock, person, "scale(1)", "scale(1.01)", between(3, 4));
+}
+
+// A breath in gathers and settles; a breath out lets go quickly and tails off.
+const breathIn = "cubic-bezier(0.4, 0, 0.35, 1)";
+const breathOut = "cubic-bezier(0.25, 0.45, 0.3, 1)";
+
+/**
+ * Someone sitting alone, with nothing else moving, so the breath has to read
+ * as a breath (section 2). The chest (`person-body`) rises from where they sit
+ * and fills out a touch; the head (`person-head`) rides up on the shoulders by
+ * the same amount.
+ *
+ * Each breath is its own: about four and a half seconds, in for two fifths of
+ * it, out for a little longer, then a short rest before the next. No two are
+ * quite the same depth or length, and about one in seven is slower and
+ * deeper. Nothing else: no blink, no gesture.
+ */
+export function breatheSeated(clock: Clock, person: Piece) {
+  const body = child(person, "person-body");
+  const head = child(person, "person-head");
+  if (!body) return;
+  const height = body.getBBox().height;
+
+  const breath = () => {
+    const deep = Math.random() < 0.14;
+    const depth = (deep ? 1.5 : 1) * between(0.85, 1.15);
+    const duration = ms(deep ? between(5.6, 6.4) : between(4.1, 4.9));
+    const rise = 0.042 * depth;
+    const full = 0.4;
+    const empty = 0.88;
+
+    clock.play(
+      body,
+      [
+        { transform: "scale(1, 1)", easing: breathIn },
+        { transform: `scale(${1 + rise * 0.3}, ${1 + rise})`, offset: full, easing: breathOut },
+        { transform: "scale(1, 1)", offset: empty },
+        { transform: "scale(1, 1)" },
+      ],
+      { duration },
+    );
+    if (head) {
+      const lift = `translateY(${(-height * rise).toFixed(2)}px)`;
+      clock.play(
+        head,
+        [
+          { transform: "translateY(0px)", easing: breathIn },
+          { transform: lift, offset: full, easing: breathOut },
+          { transform: "translateY(0px)", offset: empty },
+          { transform: "translateY(0px)" },
+        ],
+        { duration },
+      );
+    }
+    clock.wait(duration, breath);
+  };
+
+  // Start part-way to the first breath, so it never begins the instant the scene appears.
+  clock.wait(ms(between(0.2, 1.2)), breath);
+}
+
 /**
  * Someone at the table. They breathe (a rise of one part in a hundred, every
  * 3 to 4 seconds), blink every 3 to 7 seconds, and every 6 to 12 seconds make
@@ -174,7 +238,7 @@ export function livePerson(clock: Clock, person: Piece, hand: Piece | null) {
   const head = child(person, "person-head");
   const eyes = child(person, "person-eyes");
 
-  sway(clock, person, "scale(1)", "scale(1.01)", between(3, 4));
+  breathe(clock, person);
 
   if (eyes) {
     const blink = () =>
@@ -233,22 +297,26 @@ export function livePerson(clock: Clock, person: Piece, hand: Piece | null) {
   if (gestures.length > 0) every(clock, [6, 12], () => pick(gestures)());
 }
 
-/** Biscuit, asleep: his side rises and falls, and now and then an ear twitches or his tail flicks. */
-export function liveBiscuit(clock: Clock, biscuit: Piece) {
+/** Biscuit, lying still: his side rises and falls, and his head rides the same breath. Nothing else. */
+export function breatheBiscuit(clock: Clock, biscuit: Piece) {
   const body = child(biscuit, "biscuit-body");
   const head = child(biscuit, "biscuit-head");
+  if (!body) return;
+
+  const cycle = between(3.5, 4.5);
+  const breath = sway(clock, body, "scaleY(1)", "scaleY(1.05)", cycle);
+  if (head) {
+    const nod = sway(clock, head, "translateY(0px)", "translateY(-1.5px)", cycle);
+    nod.currentTime = breath.currentTime;
+  }
+}
+
+/** Biscuit, asleep: his side rises and falls, and now and then an ear twitches or his tail flicks. */
+export function liveBiscuit(clock: Clock, biscuit: Piece) {
   const ear = child(biscuit, "biscuit-ear");
   const tail = child(biscuit, "biscuit-tail");
 
-  if (body) {
-    const cycle = between(3.5, 4.5);
-    const breath = sway(clock, body, "scaleY(1)", "scaleY(1.05)", cycle);
-    if (head) {
-      // His head rides the same breath.
-      const nod = sway(clock, head, "translateY(0px)", "translateY(-1.5px)", cycle);
-      nod.currentTime = breath.currentTime;
-    }
-  }
+  breatheBiscuit(clock, biscuit);
 
   if (ear) {
     every(clock, [7, 14], () => {

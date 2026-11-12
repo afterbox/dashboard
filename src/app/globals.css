@@ -20,6 +20,24 @@
 @custom-variant squat (@container screen (height < 360px));
 @custom-variant narrow (@container screen (width < 360px));
 
+/*
+  Not tokens: how a section with a scene beside its words is laid out (section 2).
+  `beside`: the words and the scene sit side by side, on any screen held
+  sideways and on wide ones. Otherwise the scene sits above the words.
+  `low`: a short screen held sideways, such as a phone on its side.
+  (kitchen-table.css repeats both queries for the scene's size; keep them in step.)
+*/
+@custom-variant beside {
+  @media (orientation: landscape), (width >= 64rem) {
+    @slot;
+  }
+}
+@custom-variant low {
+  @media (orientation: landscape) and (height < 600px) {
+    @slot;
+  }
+}
+
 :root {
   color-scheme: light;
   --ab-linen: #fbf6ef;

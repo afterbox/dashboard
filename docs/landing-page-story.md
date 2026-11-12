@@ -24,7 +24,7 @@
 ## The cast (Gift mode only)
 
 An original illustrated cast, flat and rounded, built from the brand palette (see the design system, "Illustration and the cast"):
-- **The family:** you, your partner, Mary (your daughter, who grows up through the page), your mum.
+- **The family:** you (Dad), your partner Jo (Mary's mum), Mary (your daughter, who grows up through the page), and your own mum.
 - **Biscuit, the family dog.** The recurring character who carries the eye from section to section: he trots in, nudges the box, wags when something is added, and quietly ages through the page (puppy → grey muzzle). He's part of the family, not a brand mascot. He's also a nod to "what happens to the dog?", one of the wishes people record.
 - **Everyday things:** the house, a bird on the roof, clouds, a kitchen table, letters, the box.
 
@@ -76,7 +76,7 @@ Each section lists: **what it says**, **what you should feel**, **what happens**
 ### 4. "Say it, for later" (the emotional core)
 - **Says:** record a video, a voice note or a letter, and give each one to exactly the right person.
 - **Feel:** tenderness; a lump in the throat.
-- **What happens:** a `blush` band. Three envelopes are addressed in handwriting: *For Mary, on her 18th birthday* · *For Tom, for when the house feels quiet* · *For Mum.* A voice-note waveform records; a short letter writes itself. Mary grows up through the illustrations as the envelopes move (child → teenager).
+- **What happens:** a `blush` band. Three envelopes are addressed in handwriting: *For Mary, on her 18th birthday* · *For Jo, for when the house feels quiet* · *For Mum.* A voice-note waveform records; a short letter writes itself. Mary grows up through the illustrations as the envelopes move (child → teenager).
 - **Mobile:** the envelopes are a swipeable stack; tapping one opens the message preview in a bottom sheet.
 - **Motion signature:** slow, unhurried (no bounce): paper sliding, ink appearing.
 - **Hand-off:** the envelopes slide into the box, and the lid begins to close.

@@ -1,0 +1,149 @@
+/*
+  Section 2, "The kitchen table": the size of the night scene, and its colours.
+
+  The scene stays on screen while the words scroll past it.
+    Stacked (a phone or tablet held upright): a strip under the nav, about a
+    third of the screen, with the words passing beneath it.
+    Beside (held sideways, or a wide screen): a tall panel in the right-hand
+    column, centred between the nav and the bottom of the screen.
+
+  It sets three things the layout reads:
+    --kt-nav  the height of the nav above it
+    --kt-h    the height of the scene
+    --kt-top  where it sticks
+
+  The two media queries match the `beside` and `low` variants in globals.css.
+*/
+
+.kitchen-table {
+  --kt-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 16);
+  --kt-h: max(32svh, 10.5rem);
+  --kt-top: var(--kt-nav);
+}
+
+@media (width >= 48rem) {
+  .kitchen-table {
+    --kt-nav: calc(env(safe-area-inset-top, 0px) + var(--spacing) * 18);
+  }
+}
+
+@media (orientation: landscape), (width >= 64rem) {
+  .kitchen-table {
+    --kt-gap: calc(var(--spacing) * 6);
+    --kt-h: min(100svh - var(--kt-nav) - 2 * var(--kt-gap), 45rem);
+    --kt-top: calc(var(--kt-nav) + (100svh - var(--kt-nav) - var(--kt-h)) / 2);
+  }
+}
+
+@media (orientation: landscape) and (height < 600px) {
+  .kitchen-table {
+    --kt-gap: calc(var(--spacing) * 3);
+  }
+}
+
+/*
+  The night colours. Not tokens: each is mixed from two tokens, for this scene
+  only, so the room reads as night in both themes. Keepsake turns light in
+  Candlelight, so there the wall is a little of it over linen instead.
+  light-dark() follows the theme's `color-scheme`, set with the tokens in
+  globals.css. Everything in the room is a step between the wall and the light:
+  no lantern, no heartwood.
+*/
+.kitchen-night {
+  --night-wall: light-dark(
+    var(--ab-keepsake),
+    color-mix(in srgb, var(--ab-keepsake) 20%, var(--ab-linen))
+  );
+  --night-floor: light-dark(
+    color-mix(in srgb, var(--ab-keepsake) 72%, var(--ab-ink)),
+    color-mix(in srgb, var(--ab-keepsake) 11%, var(--ab-linen))
+  );
+  --night-light: light-dark(var(--ab-linen), var(--ab-ink));
+  background: var(--night-wall);
+}
+
+.night-floor {
+  fill: var(--night-floor);
+}
+/* Furniture out of the lamplight. */
+.night-shade {
+  fill: color-mix(in srgb, var(--night-light) 11%, var(--night-wall));
+}
+.night-table {
+  fill: color-mix(in srgb, var(--night-light) 24%, var(--night-wall));
+}
+/* The living: Mary's mum, Biscuit. */
+.night-soft {
+  fill: color-mix(in srgb, var(--night-light) 46%, var(--night-wall));
+}
+/* What the lamp and the laptop light up. */
+.night-pale {
+  fill: color-mix(in srgb, var(--night-light) 70%, var(--night-wall));
+}
+.night-box {
+  fill: color-mix(in srgb, var(--night-light) 86%, var(--night-wall));
+}
+.night-light {
+  fill: var(--night-light);
+}
+/* The lamp's light on the air: one flat, faint shape. */
+.night-beam {
+  fill: var(--night-light);
+  opacity: 0.08;
+}
+/* A sheet of paper. The thin edge keeps overlapping sheets apart. */
+.night-sheet {
+  fill: var(--night-light);
+  stroke: var(--night-wall);
+  stroke-width: 2;
+}
+.night-rule {
+  fill: none;
+  stroke: color-mix(in srgb, var(--night-wall) 30%, var(--night-light));
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.night-line {
+  fill: none;
+  stroke: color-mix(in srgb, var(--night-light) 30%, var(--night-wall));
+  stroke-linecap: round;
+}
+/* A small mark cut into a shape: lowered eyes. */
+.night-mark {
+  fill: none;
+  stroke: var(--night-wall);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/*
+  The scene is drawn twice, on the hero's two boards. Which one shows depends
+  on the shape of the panel, not on how the screen is held: a wide strip shows
+  the landscape board, a tall panel the portrait one.
+*/
+.night-board[data-board="portrait"] {
+  display: none;
+}
+@container night (aspect-ratio < 1) {
+  .night-board[data-board="landscape"] {
+    display: none;
+  }
+  .night-board[data-board="portrait"] {
+    display: block;
+  }
+}
+
+/* The caret in the search bar. */
+@keyframes kt-caret {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  56%,
+  100% {
+    opacity: 0;
+  }
+}
+.kt-caret {
+  animation: kt-caret 1.1s linear infinite;
+}
