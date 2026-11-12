@@ -1,6 +1,6 @@
 # Privacy policy
 
-_Last updated: [DATE]_
+_Last updated: 12 November 2026_
 
 > **A note before we launch.** afterbox isn't open yet. Right now this website doesn't ask you for any personal information. This policy describes how afterbox will handle your information once it launches, and will be finalised before then.
 
@@ -8,21 +8,21 @@ You're trusting us with some of the most personal things in your life, and with 
 
 ## 1. Who we are
 
-**[Company legal name]** ("afterbox", "we", "us") is the controller of your personal information. We're registered with the Information Commissioner's Office (ICO) under registration number **[ICO number]**.
+**afterbox** ("afterbox", "we", "us") is the controller of your personal information.
 
-Contact us about privacy at **[privacy email]**, or write to **[address]**.
+Contact us about privacy at [privacy@afterbox.co.uk](mailto:privacy@afterbox.co.uk).
 
 ## 2. What we collect
 
-**When you visit our website:** basic technical information, such as your device, browser and pages visited, collected by our hosting provider to keep the site running and secure. [If we add analytics, describe it here, and ask for consent where needed.]
+**When you visit our website:** basic technical information, such as your device, browser and pages visited, collected by our hosting provider to keep the site running and secure.
 
-**When you create an account:** your name, email address, sign-in details, and your plan and payment status. Payments are handled by **[payment provider]**; we never see or store your full card number.
+**When you create an account:** your name, email address, sign-in details, and your plan and payment status. Payments are handled by **Stripe**; we never see or store your full card number.
 
 **What you add to your record:** information about your accounts, policies, pensions, property and wishes; where to find documents and keys; and your messages (video, voice and written). We never ask for passwords, PINs, full card numbers or security codes. Please don't add them.
 
 **About the people you name:** their names, contact details and relationship to you, so we can reach them when the time comes. Before you add someone, please make sure you're comfortable sharing their details with us. We won't contact them while you're alive except as you ask (for example, to let them know you've named them).
 
-**If you connect your bank (optional):** with your consent, read-only information about your accounts, balances and transactions, provided through **[open banking provider name]**, an FCA-authorised provider. We use it only to help you build your record.
+**If you connect your bank (optional):** with your consent, read-only information about your accounts, balances and transactions, provided through an open banking provider authorised by the Financial Conduct Authority (FCA). We use it only to help you build your record.
 
 **When a death is verified:** the executor's details and the death certificate (or equivalent document) they provide, and records of our verification checks.
 
@@ -63,14 +63,13 @@ A death certificate can include information about health. Where we handle it, we
 
 ## 6. Where it's stored
 
-We store your information in the UK [and the EEA]. If any provider processes it elsewhere, we make sure it's protected by approved safeguards, such as the UK International Data Transfer Agreement.
+We store your information in the UK. If any provider processes it elsewhere, we make sure it's protected by approved safeguards, such as the UK International Data Transfer Agreement.
 
 ## 7. How long we keep it
 
-- **Your record and messages:** while your account is open, and after a verified death for as long as is needed to deliver everything to the people you chose and for them to access it ([period, e.g. at least 2 years]), unless they ask us to delete it sooner.
-- **If you close your account:** we delete your record and messages within [30] days, except for anything we must keep by law.
+- **Your record and messages:** while your account is open, and after a verified death for as long as is needed to deliver everything to the people you chose and for them to access it (5 years), unless they ask us to delete it sooner.
+- **If you close your account:** we delete your record and messages within 60 days, except for anything we must keep by law.
 - **Payment records:** 6 years, as UK law requires.
-- **Bank connections:** your consent lasts up to [90] days at a time, and you can withdraw it at any time; we delete transaction details we no longer need.
 
 ## 8. Your rights
 
@@ -83,7 +82,7 @@ You can ask us to:
 - give your information to you or another service in a portable format;
 - stop using it where we rely on your consent (this won't affect what we did before).
 
-Email **[privacy email]**. We'll respond within one month. If you're unhappy with how we've handled your information, you can complain to the **Information Commissioner's Office** at ico.org.uk or on 0303 123 1113. We'd appreciate the chance to help first.
+Email [privacy@afterbox.co.uk](mailto:privacy@afterbox.co.uk). We'll respond within one month. If you're unhappy with how we've handled your information, you can complain to the **Information Commissioner's Office** at ico.org.uk or on 0303 123 1113. We'd appreciate the chance to help first.
 
 ## 9. After you die
 
@@ -95,7 +94,7 @@ afterbox is for adults (18+). You can name children as people to receive message
 
 ## 11. Cookies
 
-We use only the cookies needed to run the website and keep you signed in. [If we add analytics or other optional cookies, we'll ask for your consent first.]
+We use only the cookies needed to run the website and keep you signed in.
 
 ## 12. Changes to this policy
 
@@ -103,4 +102,4 @@ If we make a change that matters, we'll tell you before it takes effect.
 
 ## 13. Contact us
 
-**[Company legal name]** · **[address]** · **[privacy email]**
+**afterbox** · [privacy@afterbox.co.uk](mailto:privacy@afterbox.co.uk)

@@ -1,6 +1,6 @@
 # Terms of service
 
-_Last updated: [DATE]_
+_Last updated: 12 November 2026_
 
 > **A note before we launch.** afterbox isn't open yet. These terms describe how the service will work and will be finalised before launch. If anything changes, we'll update this page and tell anyone who has an account.
 
@@ -8,9 +8,9 @@ Thank you for being here. afterbox exists to help you gather what the people you
 
 ## 1. Who we are
 
-afterbox is provided by **[Company legal name]**, a company registered in England and Wales (company number **[number]**), with its registered office at **[address]** ("afterbox", "we", "us").
+We're **afterbox** ("afterbox", "we", "us").
 
-You can reach us at **[support email]**.
+You can reach us at [support@afterbox.co.uk](mailto:support@afterbox.co.uk).
 
 ## 2. Who can use afterbox
 
@@ -57,13 +57,9 @@ Please only add things you have the right to share. Don't use afterbox for anyth
 
 ## 8. Connecting your bank (open banking)
 
-Connecting your bank is optional. Bank connections are provided through **[open banking provider name]**, which is authorised by the Financial Conduct Authority to provide account information services. You'll be asked for your consent directly by that provider and your bank, and you can withdraw it at any time. We use read-only information about your accounts and transactions only to help you build your record (for example, spotting a payment to an insurer that may be a life policy). We can never move money.
+Connecting your bank is optional. Bank connections are provided through an open banking provider that is authorised by the Financial Conduct Authority to provide account information services. You'll be asked for your consent directly by that provider and your bank, and you can withdraw it at any time. We use read-only information about your accounts and transactions only to help you build your record (for example, spotting a payment to an insurer that may be a life policy). We can never move money.
 
 ## 9. Plans and payments
-
-- **Free plan.** [Description, e.g. one named person and their messages.]
-- **Paid plan.** [Price] per month or [price] per year, giving [what it includes, e.g. unlimited people and messages, bank connections and the executor guide].
-- **Family support** is charged [as a one-off fee of £[amount] / as described at the time of purchase].
 
 Subscriptions renew automatically until you cancel. You can cancel at any time in your account settings, and your plan will stay active until the end of the period you've paid for. We'll give you at least 30 days' notice of any price change, and you can cancel before it takes effect.
 
@@ -80,8 +76,7 @@ If you choose, we can introduce you to independent professionals, such as a soli
 Your record is only worth something if it outlives you, so we plan for the possibility that afterbox might not be here one day:
 
 - You can download a copy of your record at any time.
-- [We hold an encrypted copy of records with an independent escrow provider, which can be released to you if we stop operating.]
-- If we ever decide to close the service, we'll give you at least [90] days' notice and help you take your record with you.
+- If we ever decide to close the service, we'll give you at least 90 days' notice and help you take your record with you.
 
 ## 12. Changes to afterbox and to these terms
 
@@ -89,7 +84,7 @@ We'll keep improving afterbox. If we make a change to these terms that matters t
 
 ## 13. Closing your account
 
-You can close your account at any time. If you do, we'll delete your record and messages within [30] days, except for anything we're legally required to keep. Once deleted, it can't be recovered, so please download a copy first if you'd like one. We may suspend or close an account that breaks these terms, and we'll tell you why unless the law prevents it.
+You can close your account at any time. If you do, we'll delete your record and messages within 60 days, except for anything we're legally required to keep. Once deleted, it can't be recovered, so please download a copy first if you'd like one. We may suspend or close an account that breaks these terms, and we'll tell you why unless the law prevents it.
 
 ## 14. Our responsibility to you
 
@@ -99,7 +94,7 @@ Otherwise, we aren't responsible for losses that weren't reasonably foreseeable,
 
 ## 15. If something goes wrong
 
-Please tell us first at **[support email]**. We'll do our best to put it right. If we can't resolve it, you may be able to use an alternative dispute resolution service, and you can always go to court.
+Please tell us first at [support@afterbox.co.uk](mailto:support@afterbox.co.uk). We'll do our best to put it right. If we can't resolve it, you may be able to use an alternative dispute resolution service, and you can always go to court.
 
 ## 16. The law that applies
 
@@ -107,4 +102,4 @@ These terms are governed by the law of England and Wales. If you live in Scotlan
 
 ## 17. Contact us
 
-**[Company legal name]** · **[address]** · **[support email]**
+**afterbox** · [support@afterbox.co.uk](mailto:support@afterbox.co.uk)

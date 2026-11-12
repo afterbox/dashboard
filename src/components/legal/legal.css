@@ -1,0 +1,10 @@
+/* The legal pages open with one fade, and nothing else moves. Reduced motion: globals.css makes it instant. */
+.legal-fade {
+  animation: legal-fade 600ms var(--ease-gift) both;
+}
+
+@keyframes legal-fade {
+  from {
+    opacity: 0;
+  }
+}

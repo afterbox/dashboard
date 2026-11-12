@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Caveat, Figtree, Fraunces } from "next/font/google";
 import { StartAtTop } from "@/components/StartAtTop";
+import { RememberPath } from "@/components/ui/BackLink";
 import { pageMetadata, site } from "@/lib/site";
 import "./globals.css";
 
@@ -64,6 +65,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col bg-linen text-ink">
         <StartAtTop />
+        <RememberPath />
         {children}
       </body>
     </html>

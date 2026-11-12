@@ -30,15 +30,17 @@ export const site = {
 type PageMetadata = {
   /** The page's own title. The layout adds " · afterbox". */
   title?: string;
+  /** Use the title exactly as given, without the layout's " · afterbox". */
+  whole?: boolean;
   description: string;
   /** The page's path, from the root: its canonical address. */
   path: string;
 };
 
-export function pageMetadata({ title, description, path }: PageMetadata): Metadata {
-  const social = title ? `${title} · ${site.name}` : site.title;
+export function pageMetadata({ title, whole = false, description, path }: PageMetadata): Metadata {
+  const social = title ? (whole ? title : `${title} · ${site.name}`) : site.title;
   return {
-    ...(title && { title }),
+    ...(title && { title: whole ? { absolute: title } : title }),
     description,
     alternates: { canonical: path },
     openGraph: {

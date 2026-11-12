@@ -10,9 +10,10 @@ import { GiftButton } from "@/components/ui/GiftButton";
 import { Wordmark } from "@/components/ui/Wordmark";
 
 const links = [
-  { href: "#how-it-works", label: "How it works" },
-  { href: "#families", label: "For families" },
-  { href: "#organisations", label: "For organisations" },
+  // From the root, so they also work from /terms and /privacy.
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#families", label: "For families" },
+  { href: "/#organisations", label: "For organisations" },
 ];
 
 /** True once the hero has scrolled up behind the nav. */
@@ -33,8 +34,13 @@ function usePastHero(header: RefObject<HTMLElement | null>) {
   return past;
 }
 
+type NavProps = {
+  /** The page opens on the hero, and the bar is see-through over it. Elsewhere it is solid from the start. */
+  overHero?: boolean;
+};
+
 // 0. Navigation: who we are, quietly.
-export function Nav() {
+export function Nav({ overHero = true }: NavProps) {
   const header = useRef<HTMLElement>(null);
   const pastHero = usePastHero(header);
   // Another heartwood button is in view: the hero's own, or "Add it" in section 3's demo.
@@ -75,7 +81,7 @@ export function Nav() {
       <div
         aria-hidden
         className={`absolute inset-0 border-b border-line bg-linen transition-opacity duration-200 ease-state ${
-          pastHero || zooming ? "opacity-100" : "opacity-0"
+          pastHero || zooming || !overHero ? "opacity-100" : "opacity-0"
         }`}
       />
 

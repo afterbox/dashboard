@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { BackLink } from "@/components/ui/BackLink";
 import { Wordmark } from "@/components/ui/Wordmark";
 
 type Props = {
@@ -20,6 +20,7 @@ export function PlainPage({ title, children, still = false }: Props) {
       <div className="flex h-16 items-center md:h-18">
         <Wordmark />
       </div>
+      <BackLink className="mt-2" />
       <div className="flex flex-1 flex-col justify-center pb-16 md:pb-24">
         <h1
           className={`font-display max-w-3xl text-display-l-mobile text-balance text-ink ${
@@ -31,12 +32,6 @@ export function PlainPage({ title, children, still = false }: Props) {
         <div className="mt-4 max-w-md space-y-4 text-body-l-mobile text-pretty text-ink-muted md:mt-6 md:text-body-l">
           {children}
         </div>
-        <Link
-          href="/"
-          className="mt-8 inline-flex min-h-11 items-center self-start text-label text-ink underline decoration-line underline-offset-4 transition-colors duration-200 ease-state hover:text-heartwood"
-        >
-          Back to afterbox
-        </Link>
       </div>
     </main>
   );

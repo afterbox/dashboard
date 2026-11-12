@@ -1,20 +1,16 @@
 import type { Metadata } from "next";
-import { PlainPage } from "@/components/ui/PlainPage";
+import { LegalPage } from "@/components/legal/LegalPage";
 import { pageMetadata } from "@/lib/site";
-import { trustLines } from "@/lib/trust-lines";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Terms",
-  description: "The terms for using afterbox, in plain words. We guide you. We don't give legal or financial advice.",
+  title: "Terms of service — afterbox",
+  whole: true,
+  description:
+    "The terms for using afterbox, in plain words: what we do, what we ask of you, and what we promise in return.",
   path: "/terms",
 });
 
-// PLACEHOLDER until the terms are written.
+// The words are docs/legal/terms.md. Edit them there.
 export default function Terms() {
-  return (
-    <PlainPage title="Terms">
-      <p>Our terms will be here before afterbox opens, in plain words.</p>
-      <p className="text-ink">{trustLines.advice}</p>
-    </PlainPage>
-  );
+  return <LegalPage file="terms.md" />;
 }
