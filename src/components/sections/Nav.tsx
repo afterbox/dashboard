@@ -87,7 +87,7 @@ export function Nav({ overHero = true }: NavProps) {
 
       {/* A container, so the pill can tighten on the narrowest phones without touching the side margins. */}
       <div className="@container relative mx-auto flex h-16 w-full max-w-300 items-center justify-between px-5 md:h-18 md:px-6">
-        <Wordmark />
+        <Wordmark anchored />
 
         <div className="flex items-center gap-1 md:gap-8">
           <nav aria-label="Main" className="hidden md:block">

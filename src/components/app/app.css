@@ -1,0 +1,156 @@
+/*
+  The gift box as the app shows it (./GiftBox.tsx): the box, the rings round
+  it, the handwritten tag, and the envelope that drops in when a message is
+  sealed. Gift mode: small rewards with a little overshoot (--ease-play).
+
+  The box sets its own size, --box (its width), and everything else is worked
+  out from that. `--rings` is how many rings have been earned; each ring knows
+  which one it is (--k, from 1) and is on once the count reaches it.
+
+  Only transform and opacity move. Reduced motion: the global rule in
+  globals.css cuts every animation and transition to nothing, which leaves each
+  piece in its final place.
+*/
+
+.gift-box {
+  --box: 4rem;
+  --rings: 0;
+  position: relative;
+  /* Room for the rings, which reach a little past twice the box's width. */
+  width: calc(var(--box) * 2.2);
+  height: calc(var(--box) * 2.2);
+}
+.gift-box[data-size="shelf"] {
+  --box: 5.5rem;
+}
+@media (width >= 48rem) {
+  .gift-box {
+    --box: 5.5rem;
+  }
+  .gift-box[data-size="shelf"] {
+    --box: 6.5rem;
+  }
+}
+/* The shortest phones (320 × 568): a little smaller, so the question and its button fit without scrolling. */
+@media (height < 620px) {
+  .gift-box {
+    --box: 3.25rem;
+  }
+}
+
+/* A ring grows outward from the box and settles. */
+.gift-ring {
+  --on: clamp(0, var(--rings) - var(--k) + 1, 1);
+  opacity: var(--on);
+  scale: calc(0.84 + 0.16 * var(--on));
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    scale 900ms var(--ease-play),
+    opacity 240ms var(--ease-state);
+}
+
+/* The tag: the name, in their own hand. It appears as they type. */
+.gift-tag {
+  opacity: 0;
+  scale: 0.9;
+  transition:
+    scale 360ms var(--ease-play),
+    opacity 200ms var(--ease-state);
+}
+.gift-box[data-named] .gift-tag {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Sealing: the envelope drops into the box, then the box glows, once. */
+.gift-envelope,
+.gift-glow {
+  opacity: 0;
+}
+.gift-box[data-sealing] .gift-envelope {
+  animation: gift-envelope-drop 900ms var(--ease-play) both;
+}
+.gift-box[data-sealing] .gift-glow {
+  animation: gift-glow 1400ms var(--ease-state) 700ms both;
+}
+
+@keyframes gift-envelope-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-150%) rotate(-8deg);
+  }
+  25% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(70%) scale(0.7);
+  }
+}
+@keyframes gift-glow {
+  from,
+  to {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+}
+
+/* Something lands on the shelf. */
+.shelf-item-new {
+  animation: shelf-land 520ms var(--ease-play) both;
+}
+@keyframes shelf-land {
+  from {
+    opacity: 0;
+    transform: translateY(-18px);
+  }
+}
+
+/* The recorder's level bars. Each bar's height is set from the microphone, as a scale. */
+.level-bar {
+  transform: scaleY(var(--level, 0.08));
+  transition: transform 90ms linear;
+}
+
+/* A sheet rises from the bottom edge (the same movement as the landing page's menu). */
+.sheet {
+  translate: 0 100%;
+  opacity: 0;
+  transition:
+    translate 480ms var(--ease-gift),
+    opacity 480ms var(--ease-gift),
+    display 480ms allow-discrete,
+    overlay 480ms allow-discrete;
+}
+.sheet[open] {
+  translate: 0 0;
+  opacity: 1;
+}
+@starting-style {
+  .sheet[open] {
+    translate: 0 100%;
+    opacity: 0;
+  }
+}
+.sheet::backdrop {
+  opacity: 0;
+  transition:
+    opacity 480ms var(--ease-gift),
+    display 480ms allow-discrete,
+    overlay 480ms allow-discrete;
+}
+.sheet[open]::backdrop {
+  opacity: 1;
+}
+@starting-style {
+  .sheet[open]::backdrop {
+    opacity: 0;
+  }
+}

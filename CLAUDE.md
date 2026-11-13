@@ -7,12 +7,47 @@ afterbox is a personal life vault people build over a lifetime **for the people 
 It also offers **family support**: paid, guided help for any family that has just lost someone, whether or not that person used afterbox. It reaches people through **employers, insurers and banks** who offer it to their staff and customers ("powered by afterbox").
 
 - Stack: Next.js 16 (App Router, `src/`), TypeScript, Tailwind CSS v4. Planned for animation: the Motion library (`motion`) for scroll scenes; SVG or Rive/Lottie for illustrations.
-- Status: the product isn't built yet. **The landing page is the current build.** Its primary call to action is **Build their gift** (the closing one is **Begin with someone you love**); both lead to onboarding, sign-up and then the dashboard (`/start` is a placeholder until those exist). **Never lead with "vault" in marketing copy**: lead with the people and the gift, and make every line carry both love and necessity (design system: "Lead with the gift, not the vault").
+- Status: the landing page, onboarding (`/start`) and a first version of the app (`/home`) are built, as a **prototype for test data only** (the real split-key encryption comes later; see `docs/architecture.md`). The landing page's primary call to action is **Build their gift** (the closing one is **Begin with someone you love**); both lead straight to onboarding's first question at `/start` ("Think of someone you love. Who came to mind first?"; there is no welcome screen, because the landing page has already said what this is), where sign-up is step 3, and then `/home`. For someone signed in they read **Go to your gifts**. **Never lead with "vault" in marketing copy**: lead with the people and the gift, and make every line carry both love and necessity (design system: "Lead with the gift, not the vault").
 - Launch market: UK first (domain: afterbox.co.uk), US later.
+
+## The app
+
+**Routes**
+
+- `/` — the landing page.
+- `/start` → `/start/<step>` — onboarding, one URL per step: `someone`, `message`, `keep-safe` (sign-up), `reach`, `find`, `nudges`, `everyone`. Build it from `docs/onboarding-story.md`. The pages are static; who is here is loaded in the browser from `/api/session` (`src/components/onboarding/`).
+- `/home` — their people as gift boxes, each person's gifts, the practical shelf.
+- `/signin` — returning people (email code; Google only once configured).
+- `/api/*` — route handlers: `auth/*` (Better Auth), `session`, `visitor`, `onboarding`, `people`, `gifts`, `practical-items`, `preferences`, `plan`. `api/test/*` exists only in end-to-end test mode.
+- `src/proxy.ts` — the routing guard (Next.js 16's Proxy, formerly Middleware): no session or unfinished onboarding → `/start/<saved step>`; finished → `/home`.
+
+**Backend stack** (all inside this Next.js app; `docs/architecture.md` has the detail)
+
+- Database: Supabase Postgres through **Drizzle** (`src/server/db/schema.ts`), migrations in `drizzle/` (`npm run db:generate`, `npm run db:migrate`). **Row Level Security is on for every table with no policies**; every new table needs `.enableRLS()`.
+- Auth: **Better Auth** with the Drizzle adapter; plugins `anonymous` (guest accounts, linked on sign-up) and `emailOTP` (6-digit codes). Google switches on when its two env vars exist.
+- Email: **Resend**. Storage: **Supabase Storage**, private bucket `recordings`, server only.
+- Validation: **zod** on every endpoint (`src/lib/schemas.ts`). Rules live in `src/server/services/`; every query filters by the owner.
+- Tests: **Vitest** on PGlite (`npm test`), **Playwright** (`npm run test:e2e`; it starts the app in test mode on port 3100, with made-up secrets). Screenshots of every step: `node scripts/screenshots.mjs`.
+- Client data: **TanStack Query**, all of it in `src/store/` (`client.ts` for retries, refresh and the signed-out redirect; one file per thing: `session`, `people`, `gifts`, `shelf`). It is the only global store. Components read and change server data through its hooks, never with `fetch` or a second copy in state; a change refreshes its own list only. `/start`, `/signin` and `/home` live in `src/app/(app)/`, whose layout provides it.
+- Shared app UI is in `src/components/app/` (the gift box, buttons, fields, sheets, recorder, code sign-in, offer, theme toggle). Reuse it; don't make a second button or sheet.
+
+**Env vars** (in `.env.local`, never committed; names listed in `.env.example`)
+
+`DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `RESEND_API_KEY`. Optional: `EMAIL_FROM`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `TRUELAYER_CLIENT_ID`, `TRUELAYER_CLIENT_SECRET`, `TRUELAYER_ENV`. Test only: `E2E_TEST_MODE`.
+
+**Rules for the app**
+
+- **Never print or log secrets**: no env values, keys, session tokens or sign-in codes in the terminal, in logs, in errors, in tests or in chat. (The one exception is the sign-in code in the server console in development.) Read env only through `src/server/env.ts`.
+- **Secrets stay on the server.** Anything under `src/server/` imports `server-only`. The browser never sees `SUPABASE_SECRET_KEY` or any other key.
+- **Names, never numbers.** We never store account numbers, sort codes, card numbers, PINs or passwords; validation must refuse them kindly.
+- **The free plan is one person.** A second gets the warm offer, not an error. Never delete anything because of the plan.
+- **Theme:** the app has a **Light · Dark · System** toggle (default **System**), in the `/home` header and the settings sheet, never in the middle of onboarding. The choice is saved in the person's preferences and on the device. It works by setting `data-theme` on `<html>` (nothing set means System).
 
 ## Read before building
 
 - `docs/landing-page-story.md` — **the landing page story, section by section**: what each section says, the feeling, desktop and mobile behaviour, motion signature and hand-off. Build the landing page from this.
+- `docs/onboarding-story.md` — **the onboarding story, step by step**: the words, the order and the rewards. Build `/start` from this.
+- `docs/architecture.md` — routes, data model, auth flow, storage, security and testing.
 - `docs/design-system.md` — the brand book: voice, colour, type, layout, mobile, dark mode, motion, the three modes, the illustrated cast, scroll storytelling.
 - `docs/tokens.json` — the design tokens (source of truth).
 - `docs/references.md` — what we borrow from each reference site (Mercury, Framer, Duolingo, Lemonade, Raycast, Empathy, Headspace), written as a spec with concrete numbers. Look at the matching frames in `docs/references/`.
@@ -65,7 +100,7 @@ What good looks like instead: one strong idea per screen, generous space, real p
 - Radius: `rounded-sm` 8, `rounded-md` 14, `rounded-lg` 24 (cards), `rounded-xl` 40 (panels), `rounded-pill` (buttons).
 - Shadow: `shadow-rest`, `shadow-lift`, `shadow-glow` (once, briefly, Gift mode only).
 - Easing: `ease-gift` for entrances, `ease-state` for state changes, `ease-play` (small overshoot) for playful Gift-mode moments only.
-- Dark mode (Candlelight) switches automatically through the tokens, following the device setting. Don't add `dark:` colour overrides; in dark, cards must keep their `border-line` border.
+- Dark mode (Candlelight) switches automatically through the tokens, following the device setting, or the person's own choice from the Light · Dark · System toggle. Don't add `dark:` colour overrides; in dark, cards must keep their `border-line` border.
 - Mobile first: 20px side margins (`px-5`), primary button full width at the bottom, min 44px touch targets, body text never under 16px. Draw key illustrations twice (landscape and portrait) rather than shrinking.
 
 ## Motion and performance

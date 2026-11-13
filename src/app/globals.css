@@ -9,6 +9,20 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /*
+  Not a token: someone who has finished onboarding on this device. Set on <html>
+  before the first paint (src/lib/hints.ts), so the landing page's buttons can
+  read "Go to your gifts" without a flash.
+*/
+@custom-variant member (&:where([data-member], [data-member] *));
+
+/* `short:` — the shortest phones (320 × 568), where a screen's question and its button must still fit without scrolling. */
+@custom-variant short {
+  @media (height < 620px) {
+    @slot;
+  }
+}
+
+/*
   Not tokens: screen tiers for pinned scenes, for fitting a scene to short and small screens.
   They read the `screen` container (see HeroScene), which is as tall as the screen
   at its smallest, with the browser's toolbars showing. Unlike a height media
@@ -256,5 +270,97 @@
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/*
+  View transitions (React's <ViewTransition>, used by the move from the landing
+  page into onboarding, between onboarding steps, and into /home).
+
+  - The page ground is linen on both sides, so the default crossfade reads as
+    the same room, not a page load.
+  - The wordmark stays exactly where it is.
+  - The gift box travels: it lifts off the landing page and settles in the
+    middle of the first onboarding screen (and later carries on into /home).
+  - Steps slide: forward from the right, back from the left.
+
+  Where the browser has no view transitions, pages simply change. With reduced
+  motion, the change is instant.
+*/
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 320ms;
+  animation-timing-function: var(--ease-state);
+}
+
+::view-transition-group(site-wordmark) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-wordmark) {
+  display: none;
+}
+::view-transition-new(site-wordmark) {
+  animation: none;
+}
+
+/* The box is one object: only where it is and how big it is changes. */
+::view-transition-group(.gift-morph) {
+  animation-duration: 520ms;
+  animation-timing-function: var(--ease-gift);
+  z-index: 60;
+}
+::view-transition-old(.gift-morph) {
+  display: none;
+}
+::view-transition-new(.gift-morph) {
+  animation: none;
+}
+
+::view-transition-old(.step-forward) {
+  --slide: -56px;
+  animation:
+    140ms var(--ease-state) both vt-fade reverse,
+    320ms var(--ease-gift) both vt-slide reverse;
+}
+::view-transition-new(.step-forward) {
+  --slide: 56px;
+  animation:
+    200ms var(--ease-state) 100ms both vt-fade,
+    320ms var(--ease-gift) both vt-slide;
+}
+::view-transition-old(.step-back) {
+  --slide: 56px;
+  animation:
+    140ms var(--ease-state) both vt-fade reverse,
+    320ms var(--ease-gift) both vt-slide reverse;
+}
+::view-transition-new(.step-back) {
+  --slide: -56px;
+  animation:
+    200ms var(--ease-state) 100ms both vt-fade,
+    320ms var(--ease-gift) both vt-slide;
+}
+
+@keyframes vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-slide {
+  from {
+    transform: translateX(var(--slide));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
   }
 }

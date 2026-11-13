@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Caveat, Figtree, Fraunces } from "next/font/google";
 import { StartAtTop } from "@/components/StartAtTop";
 import { RememberPath } from "@/components/ui/BackLink";
+import { beforePaintScript } from "@/lib/hints";
 import { pageMetadata, site } from "@/lib/site";
 import "./globals.css";
 
@@ -59,10 +60,16 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
+    // The script below sets data-theme and data-member on <html> before React arrives, so they differ from the server's.
     <html
       lang="en-GB"
       className={`${fraunces.variable} ${figtree.variable} ${caveat.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/* Before the first paint: the theme they chose (Light · Dark · System), so it never flashes. */}
+        <script dangerouslySetInnerHTML={{ __html: beforePaintScript }} />
+      </head>
       <body className="min-h-full flex flex-col bg-linen text-ink">
         <StartAtTop />
         <RememberPath />

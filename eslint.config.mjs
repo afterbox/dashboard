@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // End-to-end test mode's build folder (next.config.ts), and what the tests leave behind.
+    ".e2e/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 
