@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { steps } from "./onboarding";
+import { allSteps, type Step } from "./onboarding";
 import { looksLikeSecret, noNumbersMessage } from "./no-numbers";
 
 /**
@@ -248,7 +248,7 @@ export const stepInputs = {
 } as const;
 
 export const saveStepSchema = z.object({
-  step: z.enum(steps, "We don't know that step."),
+  step: z.enum(allSteps, "We don't know that step."),
   /** Checked against the step's own schema once the step is known. */
   input: z.unknown().optional(),
 });
@@ -257,7 +257,7 @@ export const saveStepSchema = z.object({
 export type OnboardingState = {
   /** `name` is how they sign their gifts ("from Dad"), once they have said. */
   user: { isGuest: boolean; email: string | null; name: string | null } | null;
-  currentStep: (typeof steps)[number];
+  currentStep: Step;
   completed: boolean;
   person: Person | null;
   /** The message sealed in onboarding, if there is one yet. */

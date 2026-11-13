@@ -235,9 +235,8 @@ describe("onboarding, end to end through the API", () => {
       currentStep: "nudges",
       bank: { providerName: "Monzo" },
     });
-    expect((await save("nudges", { reminderEmails: true })).data.currentStep).toBe("everyone");
-    expect((await save("everyone", { choice: "free" })).data.planChoice).toBe("free");
-    expect((await post(who, completeRoute.POST)).data.completed).toBe(true);
+    expect((await save("nudges", { reminderEmails: true })).data.currentStep).toBe("nudges");
+    expect((await post(who, completeRoute.POST)).data).toMatchObject({ completed: true, planChoice: "free" });
 
     // /home's data.
     const people = (await call(who, peopleRoute.GET)).data.people;

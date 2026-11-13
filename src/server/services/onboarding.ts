@@ -2,7 +2,10 @@ import { and, asc, eq } from "drizzle-orm";
 import {
   firstStep,
   isStep,
+  lastStep,
   nextStep,
+  offerInOnboarding,
+  shownStep,
   reachedStep,
   signUpStep,
   stepIndex,
@@ -40,8 +43,7 @@ export type Progress = { currentStep: Step; data: OnboardingData; completed: boo
 const notStarted: Progress = { currentStep: firstStep, data: {}, completed: false };
 
 const toProgress = (row: typeof onboardingProgress.$inferSelect): Progress => ({
-  // A step that no longer exists (there was once a welcome screen) reads as the first one.
-  currentStep: isStep(row.currentStep) ? row.currentStep : firstStep,
+  currentStep: shownStep(row.currentStep),
   data: row.data,
   completed: row.completedAt !== null,
 });
@@ -108,9 +110,9 @@ export async function saveStep(
     // Finished: there is nothing left to save. (Changes are made in /home from here on.)
     if (progress.completed) return progress;
 
-    // In order. Going back to change an earlier step is fine; skipping ahead isn't.
+    // In order. Going back to change an earlier step is fine; skipping ahead isn't, nor is a step that isn't shown.
     const reached = reachedStep(visitorOf(user, progress));
-    if (stepIndex(step) > stepIndex(reached)) throw notReached();
+    if (!isStep(step) || stepIndex(step) > stepIndex(reached)) throw notReached();
 
     const data: OnboardingData = { ...progress.data };
 
@@ -219,7 +221,8 @@ export async function saveStep(
 
 /**
  * The end of onboarding: a real account, someone they love, a sealed message
- * for them, and a choice made on the offer. Safe to call again.
+ * for them, every step reached, and a choice made on the offer (free, while
+ * the offer isn't part of onboarding). Safe to call again.
  */
 export async function completeOnboarding(db: Db, user: SessionUser): Promise<Progress> {
   if (user.isAnonymous) throw signUpRequired();
@@ -233,12 +236,18 @@ export async function completeOnboarding(db: Db, user: SessionUser): Promise<Pro
     if (!row) throw notReached();
     if (row.completedAt) return toProgress(row);
 
-    const { data } = row;
-    if (!data.someone || !data.message || !data.everyone) throw notReached();
+    const data: OnboardingData = { ...row.data };
+    if (!data.someone || !data.message || shownStep(row.currentStep) !== lastStep) throw notReached();
+    if (!data.everyone) {
+      // Without the offer in onboarding, they carry on free. It can be chosen later in /home.
+      if (offerInOnboarding) throw notReached();
+      await recordPlanChoice(tx, user.id, "free");
+      data.everyone = { choice: "free" };
+    }
 
     const [saved] = await tx
       .update(onboardingProgress)
-      .set({ completedAt: new Date(), updatedAt: new Date() })
+      .set({ data, completedAt: new Date(), updatedAt: new Date() })
       .where(eq(onboardingProgress.userId, user.id))
       .returning();
     return toProgress(saved);

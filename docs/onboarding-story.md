@@ -48,16 +48,17 @@ Small print: "We won't contact [Mary] now. Only when the time comes, and only if
 5. One thing they'd need to find — /start/find
 "Where does your main bank account live?"
 - Bank chips: Barclays · HSBC · Lloyds · NatWest · Santander · Nationwide · Monzo · Starling · Other (type a name).
-- "Just the name. Never numbers or passwords."
-- Optional: "Skip for now".
-Reward: it lands on a small shelf labelled "What they'll need to find": "One less thing for them to search for."
+- Optional: "Skip for now" (shown until a bank is chosen).
+Reward: the moment a bank is chosen it lands on a small shelf labelled "What they'll need to find": "One less thing for them to search for." It is saved once, on "Continue". A name that looks like a number or a password is refused kindly, and never goes on the shelf.
 
 6. Gentle nudges — /start/nudges
 "Life changes. Want a gentle nudge when it does?"
 Example: "You bought a home. Add it?"
 - Toggle: reminder emails (on by default, easy to turn off).
+For now this is the last step: "Continue" finishes onboarding and goes to /home, on the free plan.
 
-7. Who else? — /start/everyone (the offer)
+7. Who else? — /start/everyone (the offer). Not shown for now; everyone starts on the free plan.
+It is switched off by `offerInOnboarding` in `src/lib/onboarding.ts`; the screen is kept for later.
 "[Mary] has her gift. Who else would you build one for?"
 Two equal choices, the same size and weight:
 - "Build gifts for everyone": everyone you love, unlimited voice notes and letters, afterbox spotting what you'd forget, and a step-by-step guide for your executor. [£price] a month or [£price] a year (placeholders).

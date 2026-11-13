@@ -369,7 +369,6 @@ describe("a guest becomes an account", () => {
     await saveStep(db, store, account, "reach", {});
     await saveStep(db, store, account, "find", {});
     await saveStep(db, store, account, "nudges", { reminderEmails: true });
-    await saveStep(db, store, account, "everyone", { choice: "free" });
     await completeOnboarding(db, account);
     await updatePreference(db, accountId, { theme: "light" });
 

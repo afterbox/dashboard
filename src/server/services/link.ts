@@ -1,5 +1,5 @@
 import { eq } from "drizzle-orm";
-import { stepIndex } from "@/lib/onboarding";
+import { shownStep, stepIndex } from "@/lib/onboarding";
 import { gift, onboardingProgress, person, planInterest, practicalItem, preference } from "../db/schema";
 import type { Db } from "../db/types";
 
@@ -36,7 +36,7 @@ export async function moveGuestData(db: Db, guestId: string, accountId: string) 
 
       if (!existing) {
         await tx.insert(onboardingProgress).values({ ...guestProgress, userId: accountId, updatedAt: new Date() });
-      } else if (!existing.completedAt && stepIndex(guestProgress.currentStep) > stepIndex(existing.currentStep)) {
+      } else if (!existing.completedAt && stepIndex(shownStep(guestProgress.currentStep)) > stepIndex(shownStep(existing.currentStep))) {
         await tx
           .update(onboardingProgress)
           .set({

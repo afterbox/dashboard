@@ -1,9 +1,9 @@
 /**
- * The onboarding steps, in order (docs/onboarding-story.md). Each has its own
- * address, /start/<step>, so a refresh or the back button lands on the same
- * screen, and we can bring someone back exactly where they left off.
+ * Every onboarding step there is, in order (docs/onboarding-story.md). Each has
+ * its own address, /start/<step>, so a refresh or the back button lands on the
+ * same screen, and we can bring someone back exactly where they left off.
  */
-export const steps = [
+export const allSteps = [
   "someone",
   "message",
   "keep-safe",
@@ -13,7 +13,19 @@ export const steps = [
   "everyone",
 ] as const;
 
-export type Step = (typeof steps)[number];
+export type Step = (typeof allSteps)[number];
+
+/**
+ * The offer ("Who else would you build one for?") is kept but not asked for
+ * now: onboarding ends after the nudges, on the free plan.
+ */
+export const offerInOnboarding = false;
+
+/** The steps that are shown, in order. Everything below works from these. */
+export const steps: readonly Step[] = allSteps.filter((step) => offerInOnboarding || step !== "everyone");
+
+/** The step onboarding ends on. */
+export const lastStep: Step = steps[steps.length - 1];
 
 /** The landing page has already said what this is, so onboarding opens on its first question. */
 export const firstStep: Step = "someone";
@@ -24,6 +36,18 @@ export const isStep = (value: unknown): value is Step =>
   typeof value === "string" && (steps as readonly string[]).includes(value);
 
 export const stepIndex = (step: Step) => steps.indexOf(step);
+
+/**
+ * A saved step, as one that is shown: a step that isn't shown any more reads
+ * as the shown one before it; one that no longer exists (there was once a
+ * welcome screen) as the first.
+ */
+export function shownStep(value: string): Step {
+  if (isStep(value)) return value;
+  const at = (allSteps as readonly string[]).indexOf(value);
+  if (at === -1) return firstStep;
+  return [...allSteps.slice(0, at)].reverse().find(isStep) ?? firstStep;
+}
 
 /** The step after this one, or null after the last. */
 export const nextStep = (step: Step): Step | null => steps[stepIndex(step) + 1] ?? null;
@@ -49,7 +73,7 @@ export type Visitor =
  */
 export function reachedStep(visitor: Visitor): Step {
   if (visitor.kind === "none") return firstStep;
-  const { currentStep } = visitor;
+  const currentStep = shownStep(visitor.currentStep);
   if (visitor.kind === "guest") {
     return stepIndex(currentStep) > stepIndex(signUpStep) ? signUpStep : currentStep;
   }

@@ -89,22 +89,13 @@ for (const size of sizes.filter((s) => !onlySize || s.name === onlySize)) {
       await page.waitForURL("**/start/find");
       await shot("find-empty");
       await page.getByText("Barclays", { exact: true }).click();
-      await page.getByRole("button", { name: "Add Barclays" }).click();
       await page.getByText("One less thing for them to search for.").waitFor();
-      await shot("find-saved", { wait: 1200 });
-      await shot("find-saved-full", { fullPage: true, wait: 0 });
+      await shot("find-chosen", { wait: 1200 });
+      await shot("find-chosen-full", { fullPage: true, wait: 0 });
       await page.getByRole("button", { name: "Continue" }).click();
 
       await page.waitForURL("**/start/nudges");
       await shot("nudges");
-      await page.getByRole("button", { name: "Continue" }).click();
-
-      await page.waitForURL("**/start/everyone");
-      await shot("everyone", { fullPage: true });
-      await shot("everyone-screen", { wait: 0 });
-      await page.getByRole("button", { name: /Build gifts for everyone/ }).click();
-      await page.getByText("Paid plans open soon.").waitFor();
-      await shot("everyone-paid", { fullPage: true });
       await page.getByRole("button", { name: "Continue" }).click();
 
       await page.waitForURL("**/home");

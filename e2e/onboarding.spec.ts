@@ -10,7 +10,7 @@ test("a new person goes through all of onboarding and lands on /home", async ({ 
   await expect(page).toHaveURL(/\/start\/someone$/);
   const question = page.getByRole("heading", { name: "Think of someone you love. Who came to mind first?" });
   await expect(question).toBeFocused();
-  await expect(page.getByRole("img", { name: "Step 1 of 7" })).toBeVisible();
+  await expect(page.getByRole("img", { name: "Step 1 of 6" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Back" })).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
   expect((await page.context().cookies()).some((cookie) => cookie.name.includes("session_token"))).toBe(false);
@@ -49,30 +49,30 @@ test("a new person goes through all of onboarding and lands on /home", async ({ 
   await page.getByLabel("Mary's email").fill("mary@example.com");
   await page.getByRole("button", { name: "Save", exact: true }).click();
 
-  // 5. One thing they'd need to find: a name, never a number.
+  // 5. One thing they'd need to find: a name, never a number. Chosen, it is on the shelf at once,
+  // and nothing is sent until Continue.
   await expect(page).toHaveURL(/\/start\/find$/);
+  const saves: string[] = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST" && new URL(request.url()).pathname === "/api/onboarding") saves.push(request.url());
+  });
   await page.getByText("Other", { exact: true }).click();
   await page.getByLabel("The bank's name").fill("12-34-56 12345678");
-  await page.getByRole("button", { name: /^Add / }).click();
+  await expect(page.getByText("One less thing for them to search for.")).toHaveCount(0);
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
   await expect(page.getByText("That looks like a number or a password.")).toBeVisible();
   await page.getByText("Barclays", { exact: true }).click();
-  await page.getByRole("button", { name: "Add Barclays" }).click();
   await expect(page.getByText("One less thing for them to search for.")).toBeVisible();
+  expect(saves).toHaveLength(0);
   await page.getByRole("button", { name: "Continue", exact: true }).click();
 
-  // 6. Gentle nudges: on to begin with.
+  // 6. Gentle nudges: on to begin with. The last step for now: everyone starts on the free plan.
   await expect(page).toHaveURL(/\/start\/nudges$/);
+  expect(saves).toHaveLength(1);
   await expect(page.getByRole("switch", { name: "Reminder emails" })).toBeChecked();
   await page.getByRole("button", { name: "Continue", exact: true }).click();
 
-  // 7. Who else? Two equal choices and the promise. Paid records interest and says so.
-  await expect(page).toHaveURL(/\/start\/everyone$/);
-  await expect(page.getByText("Whatever you choose, Mary's message will always reach her.")).toBeVisible();
-  await page.getByRole("button", { name: /Build gifts for everyone/ }).click();
-  await expect(page.getByText("Paid plans open soon. We'll save your place and let you know.")).toBeVisible();
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
-
-  // 8. Home: Mary's box, her sealed envelope, and the bank on the shelf.
+  // Home: Mary's box, her sealed envelope, and the bank on the shelf.
   await expect(page).toHaveURL(/\/home$/);
   await expect(page.getByRole("button", { name: /Open Mary's gifts/ })).toBeVisible();
   await expect(page.getByRole("button", { name: "For Mary, on a hard day" })).toBeVisible();
@@ -129,6 +129,8 @@ test("a refresh in the middle of onboarding resumes on the same step, with nothi
 
   // Coming back through the front door, or trying to jump ahead, lands on the saved step.
   await page.goto("/start");
+  await expect(page).toHaveURL(/\/start\/keep-safe$/);
+  await page.goto("/start/nudges");
   await expect(page).toHaveURL(/\/start\/keep-safe$/);
   await page.goto("/start/everyone");
   await expect(page).toHaveURL(/\/start\/keep-safe$/);

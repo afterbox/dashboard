@@ -15,7 +15,7 @@ It also offers **family support**: paid, guided help for any family that has jus
 **Routes**
 
 - `/` — the landing page.
-- `/start` → `/start/<step>` — onboarding, one URL per step: `someone`, `message`, `keep-safe` (sign-up), `reach`, `find`, `nudges`, `everyone`. Build it from `docs/onboarding-story.md`. The pages are static; who is here is loaded in the browser from `/api/session` (`src/components/onboarding/`).
+- `/start` → `/start/<step>` — onboarding, one URL per step: `someone`, `message`, `keep-safe` (sign-up), `reach`, `find`, `nudges`. The offer step (`everyone`) is kept but not shown for now (`offerInOnboarding` in `src/lib/onboarding.ts`), so everyone finishes on the free plan. Build it from `docs/onboarding-story.md`. The pages are static; who is here is loaded in the browser from `/api/session` (`src/components/onboarding/`).
 - `/home` — their people as gift boxes, each person's gifts, the practical shelf.
 - `/signin` — returning people (email code; Google only once configured).
 - `/api/*` — route handlers: `auth/*` (Better Auth), `session`, `visitor`, `onboarding`, `people`, `gifts`, `practical-items`, `preferences`, `plan`. `api/test/*` exists only in end-to-end test mode.

@@ -65,9 +65,6 @@ export async function onboard(page: Page, email: string, name = "Mary") {
   await expect(page).toHaveURL(/\/start\/nudges$/);
   await page.getByRole("button", { name: "Continue", exact: true }).click();
 
-  await expect(page).toHaveURL(/\/start\/everyone$/);
-  await page.getByRole("button", { name: /Keep going free/ }).click();
-
   await expect(page).toHaveURL(/\/home$/);
   await expect(page.getByRole("button", { name: new RegExp(`Open ${name}'s gifts`) })).toBeVisible();
 }

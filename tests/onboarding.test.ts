@@ -78,8 +78,11 @@ describe("onboarding progress", () => {
     expect((await getOnboardingState(db, member, false)).currentStep).toBe("reach");
     expect((await saveStep(db, store, member, "reach", { email: "mary@example.com" })).currentStep).toBe("find");
     expect((await saveStep(db, store, member, "find", { providerName: "Monzo" })).currentStep).toBe("nudges");
-    expect((await saveStep(db, store, member, "nudges", { reminderEmails: false })).currentStep).toBe("everyone");
-    expect((await saveStep(db, store, member, "everyone", { choice: "paid_interest" })).currentStep).toBe("everyone");
+    // The nudges are the last step for now: the offer isn't part of onboarding, and can't be saved as a step.
+    expect((await saveStep(db, store, member, "nudges", { reminderEmails: false })).currentStep).toBe("nudges");
+    expect((await refusal(saveStep(db, store, member, "everyone", { choice: "paid_interest" }))).code).toBe(
+      "step_not_reached",
+    );
 
     const done = await completeOnboarding(db, member);
     expect(done.completed).toBe(true);
@@ -92,7 +95,8 @@ describe("onboarding progress", () => {
     const [bank] = await db.select().from(practicalItem).where(eq(practicalItem.ownerId, member.id));
     expect(bank).toMatchObject({ category: "bank", providerName: "Monzo" });
     const choices = await db.select().from(planInterest).where(eq(planInterest.userId, member.id));
-    expect(choices.map((c) => c.choice)).toEqual(["paid_interest"]);
+    // Finishing without the offer puts them on the free plan.
+    expect(choices.map((c) => c.choice)).toEqual(["free"]);
 
     const state = await getOnboardingState(db, member, false);
     expect(state).toMatchObject({
@@ -102,7 +106,7 @@ describe("onboarding progress", () => {
       gift: { kind: "letter" },
       bank: { providerName: "Monzo" },
       preference: { theme: "system", reminderEmails: false },
-      planChoice: "paid_interest",
+      planChoice: "free",
     });
   });
 
@@ -181,11 +185,20 @@ describe("onboarding progress", () => {
     expect((await getProgress(db, guest.id)).currentStep).toBe("keep-safe");
   });
 
-  it("can't be completed before the gift is made and the offer answered", async () => {
+  it("can't be completed before the gift is made and every step reached", async () => {
     const member = await addUser(db);
     expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
     await saveStep(db, store, member, "someone", { name: "Mary", relationship: "daughter" });
     expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
+    await saveStep(db, store, member, "message", letter);
+    // A gift, but the reach, find and nudge steps are still ahead.
+    expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
+  });
+
+  it("reads someone saved on the hidden offer step as on the step before it", async () => {
+    const member = await addUser(db);
+    await db.insert(onboardingProgress).values({ userId: member.id, currentStep: "everyone" });
+    expect((await getProgress(db, member.id)).currentStep).toBe("nudges");
   });
 
   it("checks each step's input, kindly", async () => {
@@ -234,7 +247,6 @@ describe("onboarding progress", () => {
     await saveStep(db, store, member, "reach", {});
     await saveStep(db, store, member, "find", {});
     await saveStep(db, store, member, "nudges", { reminderEmails: true });
-    await saveStep(db, store, member, "everyone", { choice: "free" });
     await completeOnboarding(db, member);
     // Completing twice is fine.
     expect((await completeOnboarding(db, member)).completed).toBe(true);
