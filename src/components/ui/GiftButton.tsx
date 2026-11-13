@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { useSyncExternalStore } from "react";
 
 type Props = {
@@ -30,7 +30,7 @@ const labels = {
   closing: "Begin with someone you love",
 };
 
-const never = () => () => {};
+const never = () => () => { };
 
 /**
  * True for someone who has finished onboarding on this device. The page is

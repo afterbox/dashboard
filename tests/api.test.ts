@@ -123,10 +123,11 @@ describe("the session endpoint", () => {
     const first = await call(who, sessionRoute.GET);
     expect(first.data.user).toEqual({ isGuest: true, email: null, name: null });
 
-    // Asking again doesn't make a second guest.
+    // Asking again doesn't make a second guest: no new session cookie.
     const again = await post(who, sessionRoute.POST);
     expect(again.status).toBe(200);
-    expect(again.response.headers.getSetCookie()).toEqual([]);
+    const names = again.response.headers.getSetCookie().map((cookie) => cookie.slice(0, cookie.indexOf("=")));
+    expect(names).not.toContain("afterbox.session_token");
     expect((await who.whoAmI())!.isAnonymous).toBe(true);
   });
 

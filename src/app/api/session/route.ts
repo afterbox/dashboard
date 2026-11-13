@@ -1,10 +1,12 @@
 import { getAuth } from "@/server/auth";
-import { json, openRoute } from "@/server/api";
+import { json, openRoute, stateResponse } from "@/server/api";
 import { env } from "@/server/env";
 import { getOnboardingState } from "@/server/services/onboarding";
 
 /** Who is here, and everything onboarding has saved for them so far. */
-export const GET = openRoute(async ({ user, db }) => getOnboardingState(db, user, env().googleEnabled));
+export const GET = openRoute(async ({ request, user, db }) =>
+  stateResponse(request, await getOnboardingState(db, user, env().googleEnabled)),
+);
 
 /**
  * Begin: give this visitor a guest session, so what they make is kept from the
@@ -12,7 +14,7 @@ export const GET = openRoute(async ({ user, db }) => getOnboardingState(db, user
  */
 export const POST = openRoute(async ({ request, user, db }) => {
   const { googleEnabled } = env();
-  if (user) return getOnboardingState(db, user, googleEnabled);
+  if (user) return stateResponse(request, await getOnboardingState(db, user, googleEnabled));
 
   const auth = await getAuth();
   const signedIn = await auth.api.signInAnonymous({ headers: request.headers, returnHeaders: true });

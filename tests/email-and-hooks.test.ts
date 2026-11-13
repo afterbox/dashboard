@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
  * environment; Resend itself is mocked.
  */
 
-type SendResult = { data: { id: string } | null; error: { name: string } | null };
+type SendResult = { data: { id: string } | null; error: { name: string; message?: string } | null };
 const send = vi.fn<(message: unknown) => Promise<SendResult>>(async () => ({ data: { id: "email_1" }, error: null }));
 
 vi.mock("resend", () => ({
@@ -69,7 +69,10 @@ describe("the code email", () => {
   it("production: if the email can't be sent, sign-in fails, and still nothing secret is logged", async () => {
     vi.stubEnv("E2E_TEST_MODE", "");
     vi.stubEnv("NODE_ENV", "production");
-    send.mockResolvedValueOnce({ data: null, error: { name: "validation_error" } });
+    send.mockResolvedValueOnce({
+      data: null,
+      error: { name: "validation_error", message: "Your code 482913 couldn't go to dad@example.com." },
+    });
     const { sendCode } = await import("@/server/email");
 
     await expect(sendCode({ to: "dad@example.com", code: "482913" })).rejects.toThrow(/couldn't be sent/);

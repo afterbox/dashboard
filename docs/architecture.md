@@ -31,7 +31,7 @@ One Next.js 16 app (App Router, `src/`). No separate server: pages, route handle
 
 The guard is for getting people to the right place. It is not the security boundary: every query below checks ownership again.
 
-The Proxy can run apart from the rest of the app, so it opens no database connection of its own: it passes the request's cookie to our own `/api/visitor` and applies the rules in `src/lib/onboarding.ts` (`redirectFor`, which has its own tests). With no session cookie it asks nothing.
+The Proxy can run apart from the rest of the app, so it opens no database connection of its own. It reads where someone is from a signed cookie, `afterbox.where` (`src/server/visitor-hint.ts`), which every response carrying onboarding state keeps up to date, and applies the rules in `src/lib/onboarding.ts` (`redirectFor`, which has its own tests). The cookie is signed with `BETTER_AUTH_SECRET` and tied to the session cookie, so one changed by hand, or left over from an earlier session, is ignored: then the Proxy passes the request's cookie to our own `/api/visitor`, once, and keeps the answer. With no session cookie it asks nothing, and clears the hint. Like the Proxy itself, the hint opens nothing.
 
 It also sets a small cookie, `afterbox.home=1`, for someone who has finished onboarding (and clears it otherwise). The landing page is static, so this is how its buttons know to read "Go to your gifts": a script in `<head>` (`src/lib/hints.ts`) turns the cookie into `<html data-member>` before the first paint, and CSS shows the right words. The cookie is a hint for the words on a button and nothing else: it is not the session and opens nothing.
 
@@ -84,7 +84,7 @@ scripts/migrate.mjs          `npm run db:migrate`
 
 ## Data model
 
-Postgres (Supabase), through Drizzle. Migrations are generated with `npm run db:generate` and applied with `npm run db:migrate` (`scripts/migrate.mjs`: Drizzle's own migrator, which says why when it can't connect, where `drizzle-kit migrate` exits without a word). `DATABASE_URL` must be Supabase's **Session pooler** string: the direct connection only works over IPv6.
+Postgres (Supabase), through Drizzle. Migrations are generated with `npm run db:generate` and applied with `npm run db:migrate` (`scripts/migrate.mjs`: Drizzle's own migrator, which says why when it can't connect, where `drizzle-kit migrate` exits without a word). `DATABASE_URL` must be Supabase's **Session pooler** string: the direct connection only works over IPv6. The app talks to it through **node-postgres** (`pg`), which sends a query and its values in one round trip (postgres.js, without prepared statements, takes two). In development idle connections are kept open, and one is opened when the server starts (`src/instrumentation.ts`), because opening one is the slowest part from far away.
 
 - **Better Auth tables:** `user` (with `is_anonymous`), `session`, `account`, `verification`, `rate_limit`.
 - **`person`** — `id, owner_id, name, relationship, email?, phone?, birthday?, created_at, updated_at`.
@@ -103,13 +103,13 @@ Every row has an owner, and **every query filters by the signed-in user's id** (
 
 ## Auth flow
 
-Better Auth with the Drizzle adapter, sessions in secure httpOnly cookies (30 days, refreshed daily).
+Better Auth with the Drizzle adapter, sessions in secure httpOnly cookies (30 days, refreshed daily), with a 2-minute signed copy of the session in a cookie (`cookieCache`). **Reads** (`GET`) may trust that copy and skip the database; **anything that changes something** checks the session against the database (`src/server/session.ts`), so a session that has ended can't change anything. Our route handlers pass the renewed copy back to the browser.
 
 1. **Guest first.** Answering the first question ("This is for Mary") starts a guest (anonymous) account, so a person, a message and progress can be saved before we ask who they are. Opening `/start` alone starts nothing.
 2. **Sign-up is step 3.** Email → a 6-digit code (5 minutes, 3 tries, stored hashed). Verifying it creates or finds the real account.
 3. **Linking.** Better Auth's `onLinkAccount` then moves the guest's people, gifts, practical items, plan choices, progress and preferences to the real account **in one transaction**, and the guest account is removed. If the email already had an account, the guest's work joins it.
 4. **Google** switches on by itself when `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set; the button only shows then.
-5. **Sign out** ends this session; **sign out everywhere** revokes all of them.
+5. **Sign out** ends this session; **sign out everywhere** revokes all of them. Another device can't change anything from that moment, and its reads end within 2 minutes, when its copy of the session runs out.
 
 **Limits:** code requests and code checks are limited per email address (in the `throttle` table) and per IP address (Better Auth's limiter, in `rate_limit`).
 

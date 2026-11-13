@@ -5,9 +5,10 @@ import { env } from "./env";
 /**
  * Email, through Resend. One email so far: the sign-in code.
  *
- * - Development: sent from Resend's shared test address (the afterbox.co.uk
- *   domain isn't verified yet), and the code is also written to the server
- *   console so sign-in works without an inbox.
+ * - Development: sent from EMAIL_FROM once it is set (a domain verified in
+ *   Resend); until then from Resend's shared test address, which only
+ *   delivers to the Resend account's own email. The code is also written to
+ *   the server console so sign-in works without an inbox.
  * - Production: sent from EMAIL_FROM. The code is never logged.
  * - End-to-end test mode: nothing is sent; the code is kept in memory for
  *   /api/test/otp.
@@ -90,14 +91,15 @@ export const sendCode: SendCode = async ({ to, code, personName }) => {
 
   resend ??= new Resend(RESEND_API_KEY);
   const { error } = await resend.emails.send({
-    from: production ? (EMAIL_FROM ?? defaultSender) : devSender,
+    from: EMAIL_FROM ?? (production ? defaultSender : devSender),
     to,
     ...codeEmail({ code, personName }),
   });
 
   if (error) {
-    // The reason, never the code or the key. In development the code is in the console, so carry on.
-    console.error(`[afterbox] The sign-in email couldn't be sent (${error.name}).`);
+    // Resend's reason (it names the rule, never the key), never the code. In development the code is in the console, so carry on.
+    const reason = (error.message ?? "").replace(/\b\d{6}\b/g, "[code]");
+    console.error(`[afterbox] The sign-in email couldn't be sent (${error.name})${reason ? `: ${reason}` : "."}`);
     if (production) throw new Error("The sign-in email couldn't be sent.");
   }
 };

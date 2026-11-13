@@ -1,5 +1,5 @@
 import { eq, sql } from "drizzle-orm";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import {
   gift,
   onboardingProgress,
@@ -512,8 +512,18 @@ describe("signing out", () => {
     expect((await phone.post("/api/auth/revoke-sessions")).status).toBe(200);
 
     expect(await db.select().from(session).where(eq(session.userId, accountId))).toEqual([]);
-    expect(await laptop.whoAmI()).toBeNull();
-    expect(await phone.whoAmI()).toBeNull();
+    // Anything checked against the database (every change) finds no session, at once.
+    expect(await laptop.whoAmI({ fresh: true })).toBeNull();
+    expect(await phone.whoAmI({ fresh: true })).toBeNull();
+
+    // A read may trust the laptop's 2-minute cookie copy, but no longer than that.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    try {
+      vi.setSystemTime(Date.now() + 2 * 60 * 1000 + 1000);
+      expect(await laptop.whoAmI()).toBeNull();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("signing out keeps everything they made", async () => {

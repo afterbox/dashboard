@@ -172,8 +172,9 @@ export function browser(handler: Handler, options: { ip?: string } = {}) {
     signInWithCode: (email: string, otp: string) =>
       send("/api/auth/sign-in/email-otp", { method: "POST", body: { email, otp } }),
     /** Who the server says this browser is, or null. */
-    async whoAmI(): Promise<{ id: string; email: string; isAnonymous: boolean } | null> {
-      const { data } = await send("/api/auth/get-session", { method: "GET" });
+    /** Who the session says this is. `fresh` asks the database, not the session's cookie copy. */
+    async whoAmI({ fresh = false } = {}): Promise<{ id: string; email: string; isAnonymous: boolean } | null> {
+      const { data } = await send(`/api/auth/get-session${fresh ? "?disableCookieCache=true" : ""}`, { method: "GET" });
       return data?.user ?? null;
     },
   };

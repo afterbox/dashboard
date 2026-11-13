@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { promises, trustLines } from "@/lib/trust-lines";
 

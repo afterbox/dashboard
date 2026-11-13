@@ -20,7 +20,9 @@ import { emailKey, hit, type Limit } from "./services/throttle";
  * - Sign-in: a 6-digit code by email (`emailOTP`). No passwords.
  * - Google: only when both of its keys are set.
  * - Sessions: an httpOnly cookie (Secure in production), 30 days, renewed
- *   daily while in use. "Sign out everywhere" is `/revoke-sessions`.
+ *   daily while in use, with a 2-minute signed copy for reads. "Sign out
+ *   everywhere" is `/revoke-sessions`: it stops changes at once, and reads
+ *   within those 2 minutes.
  */
 
 export type AuthLimits = {
@@ -90,6 +92,10 @@ export function createAuth(deps: AuthDeps) {
     session: {
       expiresIn: 60 * 60 * 24 * 30,
       updateAge: 60 * 60 * 24,
+      // A signed copy of the session in a cookie, so reads needn't ask the
+      // database. Short, because a session ended elsewhere still reads as
+      // signed in until it runs out. Changes never use it (../session.ts).
+      cookieCache: { enabled: true, maxAge: 2 * 60 },
     },
 
     advanced: {

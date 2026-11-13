@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { stepPath } from "@/lib/onboarding";

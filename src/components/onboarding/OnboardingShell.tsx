@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { GiftBox } from "@/components/app/GiftBox";
@@ -99,9 +99,8 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
             {steps.map((each, i) => (
               <span
                 key={each}
-                className={`h-1.5 rounded-pill transition-[width,background-color] duration-200 ease-state ${
-                  i + 1 === number ? "w-4 bg-keepsake" : i + 1 < number ? "w-1.5 bg-keepsake" : "w-1.5 bg-line"
-                }`}
+                className={`h-1.5 rounded-pill transition-[width,background-color] duration-200 ease-state ${i + 1 === number ? "w-4 bg-keepsake" : i + 1 < number ? "w-1.5 bg-keepsake" : "w-1.5 bg-line"
+                  }`}
               />
             ))}
           </div>

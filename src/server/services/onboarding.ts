@@ -96,16 +96,13 @@ export async function saveStep(
   const parsed = parseInput(stepInputs[step], input ?? {});
 
   return db.transaction(async (tx) => {
-    // Their progress row, held for this transaction. Made on the first save.
-    await tx
+    // Their progress row, made on the first save, and held for this
+    // transaction: an upsert that changes nothing still locks the row, in one trip.
+    const [row] = await tx
       .insert(onboardingProgress)
       .values({ userId: user.id, currentStep: firstStep })
-      .onConflictDoNothing({ target: onboardingProgress.userId });
-    const [row] = await tx
-      .select()
-      .from(onboardingProgress)
-      .where(eq(onboardingProgress.userId, user.id))
-      .for("update");
+      .onConflictDoUpdate({ target: onboardingProgress.userId, set: { userId: user.id } })
+      .returning();
     const progress = toProgress(row);
 
     // Finished: there is nothing left to save. (Changes are made in /home from here on.)
@@ -253,6 +250,8 @@ export async function getOnboardingState(
   db: Db,
   user: SessionUser | null,
   googleEnabled: boolean,
+  /** Their progress, if it has just been saved: no need to read it again. */
+  known?: Progress,
 ): Promise<OnboardingState> {
   if (!user) {
     return {
@@ -268,24 +267,23 @@ export async function getOnboardingState(
     };
   }
 
-  const progress = await getProgress(db, user.id);
-  const forPerson = await onboardingPerson(db, user.id, progress.data);
-
+  const progress = known ?? (await getProgress(db, user.id));
   const giftId = progress.data.message?.giftId;
-  const [sealed] = giftId
-    ? await db
-        .select()
-        .from(gift)
-        .where(and(eq(gift.id, giftId), eq(gift.ownerId, user.id)))
-    : [];
-
   const bankId = progress.data.find?.practicalItemId;
-  const [bank] = bankId
-    ? await db
-        .select()
-        .from(practicalItem)
-        .where(and(eq(practicalItem.id, bankId), eq(practicalItem.ownerId, user.id)))
-    : [];
+
+  // None of these depend on another: ask for them together.
+  const [forPerson, [sealed], [bank], preference, planChoice] = await Promise.all([
+    onboardingPerson(db, user.id, progress.data),
+    giftId ? db.select().from(gift).where(and(eq(gift.id, giftId), eq(gift.ownerId, user.id))) : [],
+    bankId
+      ? db
+          .select()
+          .from(practicalItem)
+          .where(and(eq(practicalItem.id, bankId), eq(practicalItem.ownerId, user.id)))
+      : [],
+    getPreferenceFor(db, user.id),
+    latestPlanChoice(db, user.id),
+  ]);
 
   return {
     user: {
@@ -299,8 +297,8 @@ export async function getOnboardingState(
     person: forPerson ? toPerson(forPerson) : null,
     gift: sealed ? toGift(sealed) : null,
     bank: bank ? toPracticalItem(bank) : null,
-    preference: await getPreferenceFor(db, user.id),
-    planChoice: await latestPlanChoice(db, user.id),
+    preference,
+    planChoice,
     googleEnabled,
   };
 }

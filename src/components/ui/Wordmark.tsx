@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 
 type Props = {
   /** The colour it is set in. Ink in the nav; linen on the footer's keepsake band. */

@@ -52,12 +52,20 @@ export function Button({
       type={type}
       disabled={disabled || busy}
       aria-busy={busy || undefined}
-      className={`inline-flex min-h-12 items-center justify-center rounded-pill border px-6 py-2 text-center text-label transition-[color,background-color,border-color,opacity] duration-200 ease-state disabled:opacity-50 ${
+      className={`relative inline-flex min-h-12 items-center justify-center rounded-pill border px-6 py-2 text-center text-label transition-[color,background-color,border-color,opacity] duration-200 ease-state disabled:not-aria-busy:opacity-50 ${
         buttonVariants[variant]
       } ${full ? "w-full" : ""} ${className}`}
       {...rest}
     >
-      {children}
+      {/* The words keep their room while it works, so the button doesn't change size. */}
+      <span className={busy ? "opacity-0" : undefined}>{children}</span>
+      {busy && (
+        <span aria-hidden className="busy-dots absolute inset-0 flex items-center justify-center gap-1.5">
+          <span />
+          <span />
+          <span />
+        </span>
+      )}
     </button>
   );
 }

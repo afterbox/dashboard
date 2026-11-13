@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type MouseEvent } from "react";
 

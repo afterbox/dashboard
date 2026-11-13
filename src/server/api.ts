@@ -1,15 +1,16 @@
 import "server-only";
 import { unstable_rethrow } from "next/navigation";
 import type { z } from "zod";
-import type { ApiErrorBody } from "@/lib/schemas";
+import type { ApiErrorBody, OnboardingState } from "@/lib/schemas";
 import { getDb } from "./db";
 import type { Db } from "./db/types";
 import { env } from "./env";
 import { AppError } from "./errors";
 import type { SessionUser } from "./services/onboarding";
-import { getSessionUser } from "./session";
+import { checkSession, type SessionCheck } from "./session";
 import { getRecordingStore, StorageError, type RecordingStore } from "./storage";
 import { parseInput } from "./validate";
+import { visitorHintFor } from "./visitor-hint";
 
 /**
  * The shape every route handler under /api shares:
@@ -17,7 +18,9 @@ import { parseInput } from "./validate";
  *   export const POST = route(async ({ request, user, db }) => { … });
  *
  * - Who is asking is worked out here, from the session cookie. `route` needs
- *   someone signed in (guest or not); `openRoute` doesn't.
+ *   someone signed in (guest or not); `openRoute` doesn't. Reads may use the
+ *   session's short-lived cookie copy; anything that changes something checks
+ *   the database (./session.ts).
  * - Requests that change something must come from this site.
  * - Whatever is returned is sent as JSON, never cached.
  * - Errors become `{ error: { code, message, fields? } }`, in plain words.
@@ -26,6 +29,17 @@ import { parseInput } from "./validate";
 const noStore = { "Cache-Control": "no-store" };
 
 export const json = (data: unknown, status = 200) => Response.json(data, { status, headers: noStore });
+
+/**
+ * Onboarding state, sent back with the routing guard's hint of where they now
+ * are (./visitor-hint.ts), so the next page doesn't have to ask the database.
+ */
+export async function stateResponse(request: Request, state: OnboardingState, status = 200) {
+  const response = json(state, status);
+  const hint = await visitorHintFor(request, state);
+  if (hint) response.headers.append("Set-Cookie", hint);
+  return response;
+}
 
 const errorBody = (code: ApiErrorBody["error"]["code"], message: string, fields?: Record<string, string>) =>
   ({ error: { code, message, ...(fields ? { fields } : {}) } }) satisfies ApiErrorBody;
@@ -87,14 +101,17 @@ type Base<P> = {
 
 type RouteContext<P> = { params: Promise<P> };
 
+const reads = (request: Request) => request.method === "GET" || request.method === "HEAD";
+
 function build<P, U>(
-  resolveUser: (request: Request) => Promise<U>,
+  resolveUser: (check: SessionCheck) => U,
   handler: (context: Base<P> & { user: U }) => Promise<unknown>,
 ) {
   return async (request: Request, context: RouteContext<P>): Promise<Response> => {
     try {
       checkOrigin(request);
-      const user = await resolveUser(request);
+      const check = await checkSession(request.headers, { fresh: !reads(request) });
+      const user = resolveUser(check);
       const result = await handler({
         request,
         params: await context.params,
@@ -102,8 +119,14 @@ function build<P, U>(
         store: getRecordingStore,
         user,
       });
-      if (result instanceof Response) return result;
-      return result === undefined ? new Response(null, { status: 204, headers: noStore }) : json(result);
+      const response =
+        result instanceof Response
+          ? result
+          : result === undefined
+            ? new Response(null, { status: 204, headers: noStore })
+            : json(result);
+      for (const cookie of check.setCookies) response.headers.append("Set-Cookie", cookie);
+      return response;
     } catch (error) {
       // Next.js stops a prerender by throwing (reading the request's headers at build time does it). That one is Next's to handle, not ours.
       unstable_rethrow(error);
@@ -116,8 +139,7 @@ function build<P, U>(
 export function route<P = Record<string, never>>(
   handler: (context: Base<P> & { user: SessionUser }) => Promise<unknown>,
 ) {
-  return build<P, SessionUser>(async (request) => {
-    const user = await getSessionUser(request.headers);
+  return build<P, SessionUser>(({ user }) => {
     if (!user) throw new AppError("unauthenticated", "Let's start again: your session has ended.");
     return user;
   }, handler);
@@ -127,5 +149,5 @@ export function route<P = Record<string, never>>(
 export function openRoute<P = Record<string, never>>(
   handler: (context: Base<P> & { user: SessionUser | null }) => Promise<unknown>,
 ) {
-  return build<P, SessionUser | null>((request) => getSessionUser(request.headers), handler);
+  return build<P, SessionUser | null>(({ user }) => user, handler);
 }

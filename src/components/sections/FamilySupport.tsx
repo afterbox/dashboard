@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/ui/Link";
 import { trustLines } from "@/lib/trust-lines";
 import { SlowFade } from "./kitchen-table/SlowFade";
 import { Asked } from "./lazy";
