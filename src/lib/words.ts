@@ -1,4 +1,4 @@
-import type { Relationship } from "./schemas";
+import type { Person, Relationship } from "./schemas";
 
 /**
  * Words that depend on who the gift is for. The story is written about Mary
@@ -16,6 +16,16 @@ export const relationshipLabels: Record<Relationship, string> = {
   friend: "Friend",
   "someone-else": "Someone else",
 };
+
+/**
+ * How they're related, in a word: one of ours, or their own beside "someone
+ * else" ("Godmother"). Null when they haven't said: a name is enough.
+ */
+export function relationshipWord(person: Pick<Person, "relationship" | "relationshipLabel">): string | null {
+  if (!person.relationship) return null;
+  if (person.relationship === "someone-else" && person.relationshipLabel) return person.relationshipLabel;
+  return relationshipLabels[person.relationship];
+}
 
 type Pronouns = { they: string; them: string; their: string };
 
@@ -49,7 +59,7 @@ export function clock(seconds: number) {
 export type Idea = { ask: string; envelope: string };
 
 /** Ideas for what to add next, shown as soft dashed outlines on /home. */
-export function nextIdeas(name: string, relationship: Relationship): Idea[] {
+export function nextIdeas(name: string, relationship: Relationship | null): Idea[] {
   const { their } = pronounsFor(relationship);
   const hardDay = { ask: "Something for a hard day?", envelope: `For ${name}, on a hard day` };
   if (relationship === "daughter" || relationship === "son") {

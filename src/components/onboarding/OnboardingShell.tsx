@@ -4,6 +4,8 @@ import { Link } from "@/components/ui/Link";
 import { useRouter, useSelectedLayoutSegment } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { GiftBox } from "@/components/app/GiftBox";
+import { BackIcon } from "@/components/app/icons";
+import { IconButton } from "@/components/app/ui";
 import { Wordmark } from "@/components/ui/Wordmark";
 import {
   firstStep,
@@ -73,7 +75,7 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-1 flex-col">
       <header className="pt-[env(safe-area-inset-top)]">
-        <div className="mx-auto flex h-16 w-full max-w-300 items-center justify-between px-5 md:h-18 md:px-6">
+        <div className="mx-auto flex h-16 w-full max-w-300 items-center justify-between px-5 max-md:short:h-12 md:h-18 md:px-6">
           <Wordmark anchored />
         </div>
       </header>
@@ -82,16 +84,9 @@ export function OnboardingShell({ children }: { children: ReactNode }) {
         {/* The way back (there is none from the first question), and the quiet row of dots. */}
         <div className="flex h-11 items-center justify-between">
           {back ? (
-            <button
-              type="button"
-              onClick={() => go(back, step)}
-              aria-label="Back"
-              className="-ml-2.5 inline-flex size-11 items-center justify-center rounded-pill text-ink"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-none stroke-current">
-                <path d="M14.5 6 8.5 12l6 6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
+            <IconButton label="Back" tip="right" onClick={() => go(back, step)} className="-ml-3">
+              <BackIcon />
+            </IconButton>
           ) : (
             <span />
           )}

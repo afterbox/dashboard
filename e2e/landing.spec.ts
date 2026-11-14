@@ -37,7 +37,9 @@ test("the landing page hands over to onboarding without a page load, and the box
 
   // Straight to the first question: the landing page has already said what this is.
   await expect(page).toHaveURL(/\/start\/someone$/);
-  await expect(page.getByRole("heading", { name: "Think of someone you love. Who came to mind first?" })).toBeFocused();
+  // Its one field is ready to type in.
+  await expect(page.getByRole("heading", { name: "Think of someone you love. Who came to mind first?" })).toBeVisible();
+  await expect(page.getByLabel("Their name")).toBeFocused();
   await expect(page.getByText("This is for the people you love most.")).toHaveCount(0);
 
   // The same document throughout: a transition, not a page load.

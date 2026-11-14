@@ -75,11 +75,16 @@ describe("onboarding progress", () => {
 
     const member = await signUp(guest);
     // Signed up: the sign-up screen is behind them.
-    expect((await getOnboardingState(db, member, false)).currentStep).toBe("reach");
-    expect((await saveStep(db, store, member, "reach", { email: "mary@example.com" })).currentStep).toBe("find");
-    expect((await saveStep(db, store, member, "find", { providerName: "Monzo" })).currentStep).toBe("nudges");
-    // The nudges are the last step for now: the offer isn't part of onboarding, and can't be saved as a step.
-    expect((await saveStep(db, store, member, "nudges", { reminderEmails: false })).currentStep).toBe("nudges");
+    expect((await getOnboardingState(db, member, false)).currentStep).toBe("find");
+    // The bank is the last step for now. The screens set aside (reaching them, the nudges, the offer) can't be saved as steps.
+    expect((await saveStep(db, store, member, "find", { providerName: "Monzo" })).currentStep).toBe("find");
+    for (const [setAside, input] of [
+      ["reach", { email: "mary@example.com" }],
+      ["nudges", { reminderEmails: false }],
+      ["everyone", { choice: "paid_interest" }],
+    ] as const) {
+      expect((await refusal(saveStep(db, store, member, setAside, input))).code).toBe("step_not_reached");
+    }
     expect((await refusal(saveStep(db, store, member, "everyone", { choice: "paid_interest" }))).code).toBe(
       "step_not_reached",
     );
@@ -89,7 +94,8 @@ describe("onboarding progress", () => {
 
     // Each step did its work.
     const [mary] = await db.select().from(person).where(eq(person.ownerId, member.id));
-    expect(mary).toMatchObject({ name: "Mary", relationship: "daughter", email: "mary@example.com" });
+    // Nobody is asked for their person's details in onboarding.
+    expect(mary).toMatchObject({ name: "Mary", relationship: "daughter", email: null, phone: null });
     const [sealed] = await db.select().from(gift).where(eq(gift.ownerId, member.id));
     expect(sealed).toMatchObject({ kind: "letter", personId: mary.id, envelopeTitle: "For Mary, on a hard day" });
     const [bank] = await db.select().from(practicalItem).where(eq(practicalItem.ownerId, member.id));
@@ -105,9 +111,33 @@ describe("onboarding progress", () => {
       person: { name: "Mary" },
       gift: { kind: "letter" },
       bank: { providerName: "Monzo" },
-      preference: { theme: "system", reminderEmails: false },
+      // Nobody is asked about reminder emails in onboarding: they stay as they are to begin with.
+      preference: { theme: "system", reminderEmails: true },
       planChoice: "free",
     });
+  });
+
+  it("the first question needs only a name; how they're related can come later, in their own word", async () => {
+    const guest = await addUser(db, { guest: true });
+    expect((await saveStep(db, store, guest, "someone", { name: "Sam" })).currentStep).toBe("message");
+    expect((await getOnboardingState(db, guest, false)).person).toMatchObject({
+      name: "Sam",
+      relationship: null,
+      relationshipLabel: null,
+    });
+
+    // Going back to say more changes the same person.
+    await saveStep(db, store, guest, "someone", { name: "Sam", relationship: "someone-else", relationshipLabel: "Godfather" });
+    expect((await getOnboardingState(db, guest, false)).person).toMatchObject({
+      relationship: "someone-else",
+      relationshipLabel: "Godfather",
+    });
+    await saveStep(db, store, guest, "someone", { name: "Sam", relationship: "friend", relationshipLabel: null });
+    expect((await getOnboardingState(db, guest, false)).person).toMatchObject({ relationship: "friend", relationshipLabel: null });
+    // And it can be taken back.
+    await saveStep(db, store, guest, "someone", { name: "Sam", relationship: null });
+    expect((await getOnboardingState(db, guest, false)).person).toMatchObject({ relationship: null, relationshipLabel: null });
+    expect(await db.select().from(person).where(eq(person.ownerId, guest.id))).toHaveLength(1);
   });
 
   it("resumes exactly where they left off, with what they made", async () => {
@@ -178,27 +208,37 @@ describe("onboarding progress", () => {
     await untilSignUp(guest);
 
     expect((await refusal(saveStep(db, store, guest, "keep-safe", {}))).code).toBe("sign_up_required");
-    expect((await refusal(saveStep(db, store, guest, "reach", { email: "mary@example.com" }))).code).toBe(
+    expect((await refusal(saveStep(db, store, guest, "find", { providerName: "Monzo" }))).code).toBe(
       "step_not_reached",
     );
     expect((await refusal(completeOnboarding(db, guest))).code).toBe("sign_up_required");
     expect((await getProgress(db, guest.id)).currentStep).toBe("keep-safe");
   });
 
-  it("can't be completed before the gift is made and every step reached", async () => {
+  it("can't be completed before the gift is made and the last step reached", async () => {
     const member = await addUser(db);
     expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
     await saveStep(db, store, member, "someone", { name: "Mary", relationship: "daughter" });
     expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
     await saveStep(db, store, member, "message", letter);
-    // A gift, but the reach, find and nudge steps are still ahead.
-    expect((await refusal(completeOnboarding(db, member))).code).toBe("step_not_reached");
+    // The gift is made, and someone already signed in is now on the last step (the bank, which may be skipped).
+    expect((await getProgress(db, member.id)).currentStep).toBe("find");
+    expect((await completeOnboarding(db, member)).completed).toBe(true);
   });
 
-  it("reads someone saved on the hidden offer step as on the step before it", async () => {
+  it("reads someone saved on a screen that is set aside as on the shown step before it", async () => {
+    // Saved before those screens were set aside: on the offer or the nudges, they are on the bank, the last step now.
+    for (const was of ["everyone", "nudges"] as const) {
+      const member = await addUser(db);
+      await db.insert(onboardingProgress).values({ userId: member.id, currentStep: was });
+      expect((await getProgress(db, member.id)).currentStep).toBe("find");
+    }
+    // On "reaching them": signed up already, so the bank is next.
     const member = await addUser(db);
-    await db.insert(onboardingProgress).values({ userId: member.id, currentStep: "everyone" });
-    expect((await getProgress(db, member.id)).currentStep).toBe("nudges");
+    await db.insert(onboardingProgress).values({ userId: member.id, currentStep: "reach" });
+    expect((await getProgress(db, member.id)).currentStep).toBe("keep-safe");
+    expect((await getOnboardingState(db, member, false)).currentStep).toBe("find");
+    expect(await getVisitor(db, member)).toMatchObject({ kind: "member", currentStep: "keep-safe" });
   });
 
   it("checks each step's input, kindly", async () => {
@@ -210,7 +250,7 @@ describe("onboarding progress", () => {
     const member = await signUp(guest);
     await saveStep(db, store, member, "someone", { name: "Mary", relationship: "daughter" });
     await saveStep(db, store, member, "message", letter);
-    await saveStep(db, store, member, "reach", {});
+    await saveStep(db, store, member, "keep-safe", {});
 
     // "Just the name. Never numbers or passwords."
     const numbers = await refusal(saveStep(db, store, member, "find", { providerName: "Monzo 12345678" }));
@@ -220,17 +260,16 @@ describe("onboarding progress", () => {
     expect((await getProgress(db, member.id)).currentStep).toBe("find");
   });
 
-  it("how to reach them and the bank can both be left for later", async () => {
+  it("the bank can be left for later", async () => {
     const guest = await addUser(db, { guest: true });
     await untilSignUp(guest);
     const member = await signUp(guest);
 
-    const afterReach = await saveStep(db, store, member, "reach", {});
-    expect(afterReach.currentStep).toBe("find");
-    expect(afterReach.data.reach).toEqual({ later: true });
+    const afterSignUp = await saveStep(db, store, member, "keep-safe", {});
+    expect(afterSignUp.currentStep).toBe("find");
 
     const afterFind = await saveStep(db, store, member, "find", {});
-    expect(afterFind.currentStep).toBe("nudges");
+    expect(afterFind.currentStep).toBe("find");
     expect(await db.select().from(practicalItem).where(eq(practicalItem.ownerId, member.id))).toEqual([]);
 
     // Going back and adding the bank after all, then changing it: still one.
@@ -244,9 +283,8 @@ describe("onboarding progress", () => {
     const guest = await addUser(db, { guest: true });
     await untilSignUp(guest);
     const member = await signUp(guest);
-    await saveStep(db, store, member, "reach", {});
+    await saveStep(db, store, member, "keep-safe", {});
     await saveStep(db, store, member, "find", {});
-    await saveStep(db, store, member, "nudges", { reminderEmails: true });
     await completeOnboarding(db, member);
     // Completing twice is fine.
     expect((await completeOnboarding(db, member)).completed).toBe(true);
@@ -295,8 +333,12 @@ describe("the routing guard's rules", () => {
     expect(redirectFor("/start/message", guest)).toBeNull();
     // Back is fine; ahead is not.
     expect(redirectFor("/start/someone", guest)).toBeNull();
-    expect(redirectFor("/start/reach", guest)).toBe("/start/message");
+    expect(redirectFor("/start/find", guest)).toBe("/start/message");
     expect(redirectFor("/start/nonsense", guest)).toBe("/start/message");
+    // The screens set aside lead to where they are, like any address that isn't a step.
+    for (const setAside of ["reach", "nudges", "everyone"]) {
+      expect(redirectFor(`/start/${setAside}`, guest)).toBe("/start/message");
+    }
     // A guest may still sign in to an account they already have.
     expect(redirectFor("/signin", guest)).toBeNull();
   });
@@ -308,12 +350,14 @@ describe("the routing guard's rules", () => {
 
   it("signed in but not finished: carries on, and never sees sign-up again", () => {
     const member = memberAt("keep-safe");
-    expect(reachedStep(member)).toBe("reach");
-    expect(redirectFor("/start/keep-safe", member)).toBe("/start/reach");
-    expect(redirectFor("/start", member)).toBe("/start/reach");
-    expect(redirectFor("/home", member)).toBe("/start/reach");
-    expect(redirectFor("/signin", member)).toBe("/start/reach");
-    expect(redirectFor("/start/reach", member)).toBeNull();
+    expect(reachedStep(member)).toBe("find");
+    expect(redirectFor("/start/keep-safe", member)).toBe("/start/find");
+    expect(redirectFor("/start", member)).toBe("/start/find");
+    expect(redirectFor("/home", member)).toBe("/start/find");
+    expect(redirectFor("/signin", member)).toBe("/start/find");
+    expect(redirectFor("/start/find", member)).toBeNull();
+    expect(redirectFor("/start/reach", member)).toBe("/start/find");
+    expect(redirectFor("/start/nudges", member)).toBe("/start/find");
     // An account that signed in before ever starting begins at the beginning.
     expect(redirectFor("/home", memberAt("someone"))).toBe("/start/someone");
   });

@@ -1,5 +1,5 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
-import { newEmail, onboard, signInWithCode } from "./helpers";
+import { newEmail, onboard, renameEnvelope, signInWithCode } from "./helpers";
 
 /*
   The store (src/store): what is shown before the server answers, what is put
@@ -118,9 +118,9 @@ test("a new gift joins at once, and one that can't be sealed is kept to try agai
   const letter = sheet.getByLabel("Your letter to Mary");
 
   await sheet.getByRole("button", { name: "Add another for Mary" }).click();
-  await sheet.getByRole("button", { name: "Write it instead" }).click();
+  await sheet.getByRole("button", { name: "Write instead" }).click();
   await letter.fill("Remember the blue bicycle.");
-  await sheet.getByLabel("Name the envelope").fill("For Mary, about the bicycle");
+  await renameEnvelope(sheet, "For Mary, about the bicycle");
 
   // The first try can't reach the server.
   const cutOff = (route: Route) => (route.request().method() === "POST" ? route.abort() : route.continue());

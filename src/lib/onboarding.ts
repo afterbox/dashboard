@@ -17,12 +17,22 @@ export type Step = (typeof allSteps)[number];
 
 /**
  * The offer ("Who else would you build one for?") is kept but not asked for
- * now: onboarding ends after the nudges, on the free plan.
+ * now: onboarding ends on the free plan.
  */
 export const offerInOnboarding = false;
 
+/**
+ * Two more screens are kept but not asked for now, so onboarding is four short
+ * steps: how to reach the person they named (their email or phone), and the
+ * reminder emails. Reminder emails stay as they are by default, and can be
+ * changed in /home's settings.
+ */
+const setAside: readonly Step[] = ["reach", "nudges"];
+
 /** The steps that are shown, in order. Everything below works from these. */
-export const steps: readonly Step[] = allSteps.filter((step) => offerInOnboarding || step !== "everyone");
+export const steps: readonly Step[] = allSteps.filter(
+  (step) => !setAside.includes(step) && (offerInOnboarding || step !== "everyone"),
+);
 
 /** The step onboarding ends on. */
 export const lastStep: Step = steps[steps.length - 1];
@@ -49,11 +59,12 @@ export function shownStep(value: string): Step {
   return [...allSteps.slice(0, at)].reverse().find(isStep) ?? firstStep;
 }
 
-/** The step after this one, or null after the last. */
-export const nextStep = (step: Step): Step | null => steps[stepIndex(step) + 1] ?? null;
+/** The shown step after this one, or null after the last. */
+export const nextStep = (step: Step): Step | null => allSteps.slice(allSteps.indexOf(step) + 1).find(isStep) ?? null;
 
-/** The step before this one, or null before the first. */
-export const previousStep = (step: Step): Step | null => steps[stepIndex(step) - 1] ?? null;
+/** The shown step before this one, or null before the first. */
+export const previousStep = (step: Step): Step | null =>
+  [...allSteps.slice(0, allSteps.indexOf(step))].reverse().find(isStep) ?? null;
 
 export const stepPath = (step: Step) => `/start/${step}` as const;
 

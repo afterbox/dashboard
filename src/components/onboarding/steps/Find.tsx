@@ -1,23 +1,29 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { Button, Chips, Notice, TextField } from "@/components/app/ui";
+import { ChoiceRow } from "@/components/app/ChoiceRow";
+import { Button, Notice } from "@/components/app/ui";
 import { ApiError, errorMessage } from "@/lib/api-client";
 import { looksLikeSecret, noNumbersMessage } from "@/lib/no-numbers";
 import type { OnboardingState } from "@/lib/schemas";
 import { useOnboarding } from "../OnboardingProvider";
 import { StepActions, StepFrame } from "../StepFrame";
+import { useMoveOn } from "../useMoveOn";
 
 const banks = ["Barclays", "HSBC", "Lloyds", "NatWest", "Santander", "Nationwide", "Monzo", "Starling"] as const;
 const other = "Other";
 const options = [...banks, other].map((bank) => ({ value: bank, label: bank }));
 
 /**
- * 5. One thing they'd need to find. The name of a bank and nothing more. It
- * lands on a small shelf the moment it is chosen, and is saved once, on Continue.
+ * 5. One thing they'd need to find. The name of a bank and nothing more. On a
+ * phone, one row of the four most common and "More"; the rest, and a bank of
+ * their own, are in its sheet. It lands on a small shelf the moment it is
+ * chosen, and is saved once, on Continue. For now this is the last step:
+ * Continue, or "Skip for now", leads home.
  */
 export function Find({ state }: { state: OnboardingState }) {
-  const { save, go } = useOnboarding();
+  const { save } = useOnboarding();
+  const moveOn = useMoveOn("find");
   const saved = state.bank?.providerName ?? null;
   const known = saved !== null && (banks as readonly string[]).includes(saved);
   const [choice, setChoice] = useState<string | null>(saved === null ? null : known ? saved : other);
@@ -44,7 +50,7 @@ export function Find({ state }: { state: OnboardingState }) {
     setBusy("save");
     try {
       if (name !== saved) await save("find", { providerName: name });
-      go("nudges", "find");
+      await moveOn();
     } catch (problem) {
       const fields = problem instanceof ApiError ? problem.fields : undefined;
       setError(fields?.providerName ?? errorMessage(problem));
@@ -57,7 +63,7 @@ export function Find({ state }: { state: OnboardingState }) {
     setBusy("skip");
     try {
       await save("find", {});
-      go("nudges", "find");
+      await moveOn();
     } catch (problem) {
       setError(errorMessage(problem));
       setBusy(null);
@@ -68,16 +74,24 @@ export function Find({ state }: { state: OnboardingState }) {
     <StepFrame title="Where does your main bank account live?">
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <div className="space-y-5">
-          <Chips legend="Your main bank" name="bank" options={options} value={choice} onChange={setChoice} />
-          {choice === other && (
-            <TextField
-              label="The bank's name"
-              value={typed}
-              onChange={(event) => setTyped(event.target.value)}
-              maxLength={80}
-              autoComplete="off"
-            />
-          )}
+          <ChoiceRow
+            legend="Your main bank"
+            hideLegend
+            name="bank"
+            options={options}
+            value={choice}
+            onChange={setChoice}
+            own={{
+              value: other,
+              word: typed,
+              onWord: setTyped,
+              label: "The bank's name",
+              placeholder: "The bank's name",
+              maxLength: 80,
+              // A number typed here is never shown back, on the chip or on the shelf.
+              showWord: !looksLikeSecret(typed),
+            }}
+          />
 
           {shown && (
             <div>
@@ -93,7 +107,7 @@ export function Find({ state }: { state: OnboardingState }) {
                   {shown}
                 </p>
               </div>
-              <p role="status" className="mt-3 text-body text-ink">
+              <p role="status" className="mt-2 text-body text-ink">
                 One less thing for them to search for.
               </p>
             </div>

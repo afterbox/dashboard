@@ -15,7 +15,7 @@ It also offers **family support**: paid, guided help for any family that has jus
 **Routes**
 
 - `/` — the landing page.
-- `/start` → `/start/<step>` — onboarding, one URL per step: `someone`, `message`, `keep-safe` (sign-up), `reach`, `find`, `nudges`. The offer step (`everyone`) is kept but not shown for now (`offerInOnboarding` in `src/lib/onboarding.ts`), so everyone finishes on the free plan. Build it from `docs/onboarding-story.md`. The pages are static; who is here is loaded in the browser from `/api/session` (`src/components/onboarding/`).
+- `/start` → `/start/<step>` — onboarding, one URL per step: `someone`, `message`, `keep-safe` (sign-up), `find`. Three more screens are kept but not shown for now (`setAside` and `offerInOnboarding` in `src/lib/onboarding.ts`): `reach` (their person's email or phone), `nudges` (reminder emails) and the offer (`everyone`), so everyone finishes on the free plan. Build it from `docs/onboarding-story.md`. The pages are static; who is here is loaded in the browser from `/api/session` (`src/components/onboarding/`).
 - `/home` — their people as gift boxes, each person's gifts, the practical shelf.
 - `/signin` — returning people (email code; Google only once configured).
 - `/api/*` — route handlers: `auth/*` (Better Auth), `session`, `visitor`, `onboarding`, `people`, `gifts`, `practical-items`, `preferences`, `plan`. `api/test/*` exists only in end-to-end test mode.
@@ -29,7 +29,7 @@ It also offers **family support**: paid, guided help for any family that has jus
 - Validation: **zod** on every endpoint (`src/lib/schemas.ts`). Rules live in `src/server/services/`; every query filters by the owner.
 - Tests: **Vitest** on PGlite (`npm test`), **Playwright** (`npm run test:e2e`; it starts the app in test mode on port 3100, with made-up secrets). Screenshots of every step: `node scripts/screenshots.mjs`.
 - Client data: **TanStack Query**, all of it in `src/store/` (`client.ts` for retries, refresh and the signed-out redirect; one file per thing: `session`, `people`, `gifts`, `shelf`). It is the only global store. Components read and change server data through its hooks, never with `fetch` or a second copy in state; a change refreshes its own list only. `/start`, `/signin` and `/home` live in `src/app/(app)/`, whose layout provides it.
-- Shared app UI is in `src/components/app/` (the gift box, buttons, fields, sheets, recorder, code sign-in, offer, theme toggle). Reuse it; don't make a second button or sheet.
+- Shared app UI is in `src/components/app/` (the gift box, buttons, icon buttons and their icons, fields, chips and the chip row with its "More" sheet, sheets, recorder, code sign-in, offer, theme toggle). Reuse it; don't make a second button or sheet.
 
 **Env vars** (in `.env.local`, never committed; names listed in `.env.example`)
 

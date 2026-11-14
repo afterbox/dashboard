@@ -32,6 +32,14 @@ const name = z
   .min(1, "Tell us their name.")
   .max(60, "That's a little long. A first name is enough.");
 
+const relationship = z.enum(relationships, "Choose how they're related.");
+
+/** Their own word for it, when none of ours fits: "Godmother". Kept only beside "someone else". */
+const relationshipLabel = z.preprocess(
+  blankToNull,
+  z.string().trim().max(40, "That's a little long. A word or two is enough.").nullable(),
+);
+
 const contactEmail = z.preprocess(
   blankToNull,
   z.email("That email address doesn't look right.").max(254).nullable(),
@@ -51,7 +59,9 @@ const birthday = z.preprocess(
 
 export const personCreateSchema = z.object({
   name,
-  relationship: z.enum(relationships, "Choose how they're related."),
+  /** Optional: a name is enough to begin. */
+  relationship: relationship.nullable().optional(),
+  relationshipLabel: relationshipLabel.optional(),
   email: contactEmail.optional(),
   phone: contactPhone.optional(),
   birthday: birthday.optional(),
@@ -64,7 +74,10 @@ export type PersonUpdate = z.infer<typeof personUpdateSchema>;
 export type Person = {
   id: string;
   name: string;
-  relationship: Relationship;
+  /** Null until they say. */
+  relationship: Relationship | null;
+  /** Their own word for it ("Godmother"), beside "someone else" only. */
+  relationshipLabel: string | null;
   email: string | null;
   phone: string | null;
   birthday: string | null;
@@ -236,7 +249,12 @@ export const planChoiceSchema = z.object({ choice: z.enum(planChoices, "Choose o
 
 /** One entry per step: what that screen saves. Saving a step again replaces what it saved before. */
 export const stepInputs = {
-  someone: z.object({ name, relationship: z.enum(relationships, "Choose how they're related.") }),
+  /** A name is enough. How they're related is optional. */
+  someone: z.object({
+    name,
+    relationship: relationship.nullable().optional(),
+    relationshipLabel: relationshipLabel.optional(),
+  }),
   message: messageSchema,
   "keep-safe": z.object({}),
   /** Both optional. Nothing at all means "add later". */

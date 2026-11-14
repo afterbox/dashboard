@@ -9,7 +9,7 @@ One Next.js 16 app (App Router, `src/`). No separate server: pages, route handle
 | Route | What it is |
 |---|---|
 | `/` | The landing page (static). Its buttons lead to `/start`; for someone signed in they read "Go to your gifts" and lead to `/home`. |
-| `/start` → `/start/<step>` | Onboarding, one URL per step: `someone`, `message`, `keep-safe`, `reach`, `find`, `nudges` (`docs/onboarding-story.md`). There is no welcome screen: the landing page has said what this is, so `/start` opens on the first question. The offer step, `everyone`, is not shown for now (`offerInOnboarding` in `src/lib/onboarding.ts`): it can't be visited or saved, a saved step of `everyone` reads as `nudges`, and finishing onboarding without it records the free plan. Each step is its own small static page (`src/app/(app)/start/<step>/page.tsx`); the order lives in `src/lib/onboarding.ts`. |
+| `/start` → `/start/<step>` | Onboarding, one URL per step: `someone`, `message`, `keep-safe`, `find` (`docs/onboarding-story.md`). There is no welcome screen: the landing page has said what this is, so `/start` opens on the first question. Three screens are kept but not shown for now (`setAside` and `offerInOnboarding` in `src/lib/onboarding.ts`): `reach` (their person's email or phone), `nudges` (reminder emails) and the offer, `everyone`. They can't be visited or saved, a saved step of one of them reads as the shown step before it, and finishing onboarding without the offer records the free plan. Reminder emails keep their default (on) and are changed in `/home`'s settings. Each step is its own small static page (`src/app/(app)/start/<step>/page.tsx`); the order lives in `src/lib/onboarding.ts`. |
 | `/home` | The app: their people as gift boxes, each person's gifts, the practical shelf. |
 | `/signin` | Returning people: email code (Google once configured). |
 | `/api/auth/*` | Better Auth: guest sign-in, email code send and verify, sign out, sign out everywhere. |
@@ -26,7 +26,7 @@ One Next.js 16 app (App Router, `src/`). No separate server: pages, route handle
 **The routing guard** is `src/proxy.ts` (Next.js 16 renamed Middleware to Proxy). It runs only for `/start`, `/home` and `/signin`, looks up the session and onboarding state, and redirects before anything renders:
 
 - no session, or a guest → the onboarding step they had reached (`/start/<saved step>`); a step further on than that sends them back to it;
-- signed in, onboarding unfinished → the same, from `reach` onwards;
+- signed in, onboarding unfinished → the same, from `find` onwards;
 - onboarding finished → `/home` (from `/start` and `/signin` too).
 
 The guard is for getting people to the right place. It is not the security boundary: every query below checks ownership again.
@@ -47,7 +47,7 @@ It also sets a small cookie, `afterbox.home=1`, for someone who has finished onb
 - **Moving between pages** uses the View Transitions API through React's `<ViewTransition>` (CSS in `globals.css`, "View transitions"):
   - landing page → `/start`: the page ground stays linen, the wordmark stays where it is (`view-transition-name: site-wordmark`), and the gift box travels from the landing page into the middle of the first screen (`gift-box`). The landing page draws its box twice (hero and closing scene); only the one on screen offers itself (`sections/hero/traveller.ts`). The app's box (`components/app/GiftBoxArt.tsx`) is the same drawing cut to its own bounds, which is why the two line up.
   - between steps: forward slides in from the right, back from the left (320ms, `ease-gift`). The browser's own back button carries no direction, so it changes without a slide.
-  - the last step (`/start/nudges` for now) → `/home`: the person's box travels on. Onboarding's last step fetches what `/home` shows into the store (`store/home.ts`), so the box is there on the first frame and `/home` opens without asking again.
+  - the last step (`/start/find` for now) → `/home`: the person's box travels on. Onboarding's last step fetches what `/home` shows into the store (`store/home.ts`), so the box is there on the first frame and `/home` opens without asking again.
   - No view transitions in the browser: pages simply change. Reduced motion: every transition has no length.
 - **Theme** (Light · Dark · System, default System): `data-theme` on `<html>`; nothing set means System. The choice is kept on the device (`localStorage`, read before the first paint so it never flashes) and in `preference.theme`, which `/home` applies when it loads, so it follows them to another device. Saving it is sent so that it still arrives if the tab is closed straight after. The toggle is in the `/home` header and the account sheet, never in the middle of onboarding.
 - **The recorder** (`components/app/Recorder.tsx`) asks for the microphone only when record is tapped, records with `MediaRecorder` (webm, mp4 or ogg, whichever the browser makes), stops itself at 3 minutes and counts out the last 15 seconds. The recording goes straight from the browser to storage through the signed upload URL.
@@ -87,7 +87,7 @@ scripts/migrate.mjs          `npm run db:migrate`
 Postgres (Supabase), through Drizzle. Migrations are generated with `npm run db:generate` and applied with `npm run db:migrate` (`scripts/migrate.mjs`: Drizzle's own migrator, which says why when it can't connect, where `drizzle-kit migrate` exits without a word). `DATABASE_URL` must be Supabase's **Session pooler** string: the direct connection only works over IPv6. The app talks to it through **node-postgres** (`pg`), which sends a query and its values in one round trip (postgres.js, without prepared statements, takes two). In development idle connections are kept open, and one is opened when the server starts (`src/instrumentation.ts`), because opening one is the slowest part from far away.
 
 - **Better Auth tables:** `user` (with `is_anonymous`), `session`, `account`, `verification`, `rate_limit`.
-- **`person`** — `id, owner_id, name, relationship, email?, phone?, birthday?, created_at, updated_at`.
+- **`person`** — `id, owner_id, name, relationship?, relationship_label?, email?, phone?, birthday?, created_at, updated_at`. A name is enough: `relationship` is null until they say. `relationship_label` is their own word for it ("Godmother"), kept only beside `someone-else`.
 - **`gift`** — `id, owner_id, person_id, kind ('voice' | 'letter'), envelope_title, storage_path?, content_type?, letter_text?, duration_seconds?, sealed_at, created_at`. Voice and letters only.
 - **`practical_item`** — `id, owner_id, category ('bank' | 'insurance' | 'pension' | 'property' | 'crypto' | 'wish' | 'other'), provider_name, note?, created_at`. Never account numbers, sort codes, card numbers, PINs or passwords: validation refuses anything that looks like one, kindly.
 - **`onboarding_progress`** — `user_id, current_step, data (jsonb), completed_at, updated_at`.

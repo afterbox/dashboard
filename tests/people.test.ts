@@ -6,6 +6,7 @@ import type { Db } from "@/server/db/types";
 import { AppError } from "@/server/errors";
 import { createGift } from "@/server/services/gifts";
 import { createPerson, deletePerson, getPerson, listPeople, updatePerson } from "@/server/services/people";
+import { nextIdeas, pronounsFor, relationshipWord } from "@/lib/words";
 import { addUser, fakeStore, testDb } from "./helpers";
 
 let db: Db;
@@ -33,7 +34,63 @@ describe("people", () => {
     expect(await listPeople(db, dad.id)).toEqual([mary]);
   });
 
+  it("a name is enough: how they're related is optional", async () => {
+    const dad = await addUser(db);
+    const sam = await createPerson(db, dad.id, personCreateSchema.parse({ name: "Sam" }));
+    expect(sam).toMatchObject({ name: "Sam", relationship: null, relationshipLabel: null });
+    expect(await listPeople(db, dad.id)).toEqual([sam]);
+
+    // Said later, and taken back again.
+    expect(await updatePerson(db, dad.id, sam.id, { relationship: "friend" })).toMatchObject({ relationship: "friend" });
+    expect(await updatePerson(db, dad.id, sam.id, { relationship: null })).toMatchObject({ relationship: null });
+
+    // With no relationship we never guess at "she" or "he", and there is no word for it.
+    expect(relationshipWord(sam)).toBeNull();
+    expect(pronounsFor(sam.relationship)).toEqual({ they: "they", them: "them", their: "their" });
+    expect(nextIdeas("Sam", sam.relationship).map((idea) => idea.envelope)).toEqual([
+      "For Sam, to make you smile",
+      "For Sam, on a hard day",
+    ]);
+  });
+
+  it("keeps their own word for it, beside \"someone else\" only", async () => {
+    const dad = await addUser(db);
+    const june = await createPerson(
+      db,
+      dad.id,
+      personCreateSchema.parse({ name: "June", relationship: "someone-else", relationshipLabel: "  Godmother " }),
+    );
+    expect(june).toMatchObject({ relationship: "someone-else", relationshipLabel: "Godmother" });
+    expect(relationshipWord(june)).toBe("Godmother");
+
+    // A change to something else about them leaves the word alone.
+    expect(await updatePerson(db, dad.id, june.id, { name: "Aunt June" })).toMatchObject({
+      relationship: "someone-else",
+      relationshipLabel: "Godmother",
+    });
+    // Choosing one of ours lets their word go, even if one is sent with it.
+    const friend = await updatePerson(db, dad.id, june.id, { relationship: "friend", relationshipLabel: "Godmother" });
+    expect(friend).toMatchObject({ relationship: "friend", relationshipLabel: null });
+    expect(relationshipWord(friend)).toBe("Friend");
+
+    // "Someone else" with no word is just that.
+    const tom = await addUser(db);
+    const else_ = await createPerson(db, tom.id, personCreateSchema.parse({ name: "Ray", relationship: "someone-else", relationshipLabel: " " }));
+    expect(else_).toMatchObject({ relationship: "someone-else", relationshipLabel: null });
+    expect(relationshipWord(else_)).toBe("Someone else");
+
+    // A word sent beside any other relationship is not kept.
+    const ana = await addUser(db);
+    expect(
+      await createPerson(db, ana.id, personCreateSchema.parse({ name: "Mary", relationship: "daughter", relationshipLabel: "Godmother" })),
+    ).toMatchObject({ relationship: "daughter", relationshipLabel: null });
+  });
+
   it("checks what it is given", () => {
+    // A word or two, never a paragraph.
+    expect(
+      personCreateSchema.safeParse({ name: "June", relationship: "someone-else", relationshipLabel: "x".repeat(41) }).success,
+    ).toBe(false);
     expect(personCreateSchema.safeParse({ name: "  ", relationship: "daughter" }).success).toBe(false);
     expect(personCreateSchema.safeParse({ name: "Mary", relationship: "beneficiary" }).success).toBe(false);
     expect(personCreateSchema.safeParse({ name: "Mary", relationship: "daughter", email: "not-an-email" }).success).toBe(

@@ -6,14 +6,18 @@ import { ApiError, errorMessage } from "@/lib/api-client";
 import type { Person } from "@/lib/schemas";
 import { useOnboarding } from "../OnboardingProvider";
 import { StepActions, StepFrame } from "../StepFrame";
+import { useMoveOn } from "../useMoveOn";
 
 /**
- * 4. Reaching them. Both optional, and "Add later" is exactly as visible as
+ * Reaching them. Not shown for now (`setAside` in src/lib/onboarding.ts).
+ *
+ * Both optional, and "Add later" is exactly as visible as
  * "Save": two buttons, the same size and weight. We never press for someone
- * else's details.
+ * else's details. Two bare fields that say what they are for, and nothing else.
  */
 export function Reach({ person }: { person: Person }) {
-  const { save, go } = useOnboarding();
+  const { save } = useOnboarding();
+  const moveOn = useMoveOn("reach");
   const [email, setEmail] = useState(person.email ?? "");
   const [phone, setPhone] = useState(person.phone ?? "");
   const [busy, setBusy] = useState<"save" | "later" | null>(null);
@@ -25,7 +29,7 @@ export function Reach({ person }: { person: Person }) {
     try {
       // "Add later" sends nothing and changes nothing.
       await save("reach", how === "later" ? {} : { email, phone });
-      go("find", "reach");
+      await moveOn();
     } catch (problem) {
       const fields = problem instanceof ApiError ? problem.fields : undefined;
       setErrors(fields?.email || fields?.phone ? fields : { other: errorMessage(problem) });
@@ -41,10 +45,11 @@ export function Reach({ person }: { person: Person }) {
   return (
     <StepFrame title={`When the time comes, how should we reach ${person.name}?`}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
-        <div className="space-y-5">
+        <div className="space-y-3">
           <TextField
             label={`${person.name}'s email`}
-            hint="Optional"
+            hideLabel
+            placeholder={`${person.name}'s email (optional)`}
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
@@ -56,7 +61,8 @@ export function Reach({ person }: { person: Person }) {
           />
           <TextField
             label={`${person.name}'s phone`}
-            hint="Optional"
+            hideLabel
+            placeholder={`${person.name}'s phone (optional)`}
             type="tel"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
@@ -64,7 +70,7 @@ export function Reach({ person }: { person: Person }) {
             autoComplete="off"
             inputMode="tel"
           />
-          <p className="text-small text-ink-muted">
+          <p className="pt-1 text-small text-ink-muted">
             We won&apos;t contact {person.name} now. Only when the time comes, and only if you&apos;d like us to.
           </p>
         </div>

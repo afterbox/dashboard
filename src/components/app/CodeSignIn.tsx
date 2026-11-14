@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState, type ComponentType, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ComponentType, type FormEvent, type ReactNode } from "react";
 import { api, errorMessage } from "@/lib/api-client";
-import { Button, Notice, TextField } from "./ui";
+import { AgainIcon, PencilIcon } from "./icons";
+import { Button, LinkButton, Notice, TextField } from "./ui";
 
 type Props = {
   /** Google is only offered once it has been set up (the server says so). */
@@ -13,7 +14,7 @@ type Props = {
   onSignedIn: () => void | Promise<void>;
   /** The words on the last button: "Keep it safe" in onboarding, "Sign in" for someone returning. */
   finishLabel: string;
-  /** Shown under the fields, above the button: the trust lines. */
+  /** Shown under the email field, above the button: the trust lines. Once the code is asked for, nothing else is. */
   children?: ReactNode;
   /** Where the buttons sit: onboarding pins them to the bottom of a phone. */
   Actions?: ComponentType<{ children: ReactNode }>;
@@ -59,11 +60,17 @@ export function CodeSignIn({ googleEnabled, returnTo, onSignedIn, finishLabel, c
       setCode("");
       const resent = stage === "code";
       setStage("code");
-      if (resent) setNote("A new code is on its way.");
-      // The code field is what they need next.
-      requestAnimationFrame(() => codeField.current?.querySelector("input")?.focus());
+      if (resent) {
+        setNote("A new code is on its way.");
+        codeField.current?.querySelector("input")?.focus();
+      }
     });
   };
+
+  // Once the code is asked for, its field is what they need next.
+  useEffect(() => {
+    if (stage === "code") codeField.current?.querySelector("input")?.focus();
+  }, [stage]);
 
   const signIn = (event: FormEvent) => {
     event.preventDefault();
@@ -83,7 +90,7 @@ export function CodeSignIn({ googleEnabled, returnTo, onSignedIn, finishLabel, c
         <div ref={codeField}>
           <TextField
             label="Your 6-digit code"
-            hint={`We sent it to ${email.trim()}. It lasts 5 minutes.`}
+            hint={`Sent to ${email.trim()}. It lasts 5 minutes.`}
             value={code}
             onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
             inputMode="numeric"
@@ -94,15 +101,12 @@ export function CodeSignIn({ googleEnabled, returnTo, onSignedIn, finishLabel, c
             className="tracking-[0.3em] tabular-nums"
           />
         </div>
-        <div className="mt-2 min-h-5.5">
-          <Notice tone="calm">{note}</Notice>
-        </div>
-        <div className="-ml-6 flex flex-wrap">
-          <Button variant="quiet" onClick={() => sendCode()} disabled={busy}>
+        <div className="mt-1 flex flex-wrap gap-x-6">
+          <LinkButton icon={<AgainIcon />} onClick={() => sendCode()} disabled={busy}>
             Send a new code
-          </Button>
-          <Button
-            variant="quiet"
+          </LinkButton>
+          <LinkButton
+            icon={<PencilIcon />}
             onClick={() => {
               setStage("email");
               setError(null);
@@ -110,10 +114,10 @@ export function CodeSignIn({ googleEnabled, returnTo, onSignedIn, finishLabel, c
             }}
             disabled={busy}
           >
-            Use a different email
-          </Button>
+            Change email
+          </LinkButton>
         </div>
-        {children}
+        <Notice tone="calm">{note}</Notice>
         <Actions>
           <Button type="submit" full busy={busy}>
             {finishLabel}
@@ -127,7 +131,7 @@ export function CodeSignIn({ googleEnabled, returnTo, onSignedIn, finishLabel, c
     <form onSubmit={sendCode} noValidate className="flex flex-1 flex-col">
       <TextField
         label="Your email"
-        hint="We'll send a 6-digit code. No password to remember."
+        hint="No password. We'll email you a code."
         type="email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}

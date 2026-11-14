@@ -1,17 +1,20 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { recordingRules } from "@/lib/schemas";
 import { clock } from "@/lib/words";
-import { Button, Notice } from "./ui";
+import { AgainIcon, MicIcon, PauseIcon, PlayIcon, StopIcon } from "./icons";
+import { IconButton, Notice } from "./ui";
 
 export type Recording = { blob: Blob; seconds: number };
 
 type Props = {
   value: Recording | null;
   onChange: (recording: Recording | null) => void;
-  /** The microphone can't be used (refused, or this browser has none): offer the letter instead. */
-  onUnavailable: () => void;
+  /** What sits under the record button before anything is recorded: the quiet ways out ("Write instead"). */
+  resting?: ReactNode;
+  /** An idea they picked, kept in sight while they speak. */
+  prompt?: string | null;
 };
 
 type Status = "idle" | "asking" | "recording" | "denied" | "unsupported";
@@ -29,11 +32,15 @@ const pickType = () =>
 /**
  * A voice note: record, stop, play back, record again. Up to 3 minutes.
  *
- * The microphone is only asked for when they tap record, after a line saying
- * so. If they say no, nothing breaks: we say how to turn it on, and offer the
- * letter. The bars follow their voice while it records.
+ * One thing at a time. Before: one big round button, and nothing else of its
+ * own. While recording: the same button, now stop, with the bars following
+ * their voice and the time under it. After: a small row to play it back or
+ * record it again.
+ *
+ * The microphone is only asked for when they tap record. If they say no,
+ * nothing breaks: we say how to turn it on, and writing is one tap away.
  */
-export function Recorder({ value, onChange, onUnavailable }: Props) {
+export function Recorder({ value, onChange, resting, prompt }: Props) {
   const [status, setStatus] = useState<Status>("idle");
   const [elapsed, setElapsed] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -47,6 +54,7 @@ export function Recorder({ value, onChange, onUnavailable }: Props) {
   const startedAt = useRef(0);
   const levels = useRef<HTMLDivElement>(null);
   const player = useRef<HTMLAudioElement>(null);
+  const played = useRef<HTMLDivElement>(null);
 
   // A link the player can use, for as long as there is a recording.
   useEffect(() => {
@@ -174,109 +182,112 @@ export function Recorder({ value, onChange, onUnavailable }: Props) {
 
   const left = Math.ceil(maxSeconds - elapsed);
 
-  // Recorded: play it back, or record it again.
+  /** How far through it is, drawn as a line that fills. (A fresh recording doesn't know its own length; we do.) */
+  const showPlayed = (fraction: number) => {
+    if (played.current) played.current.style.transform = `scaleX(${Math.min(1, Math.max(0, fraction)).toFixed(3)})`;
+  };
+
+  // Recorded: a small row. Play it back, or record it again.
   if (value && status !== "recording") {
     return (
-      <div className="rounded-lg border border-line bg-paper p-4">
+      <div className="reveal flex items-center gap-1 rounded-pill border border-line bg-paper p-1">
         <audio
           ref={player}
           src={url ?? undefined}
           preload="metadata"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
-          onEnded={() => setPlaying(false)}
+          onTimeUpdate={(event) => showPlayed(event.currentTarget.currentTime / value.seconds)}
+          onEnded={() => {
+            setPlaying(false);
+            showPlayed(0);
+          }}
         />
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={togglePlay}
-            aria-label={playing ? "Pause your voice note" : "Play your voice note"}
-            className="inline-flex size-14 shrink-0 items-center justify-center rounded-pill border border-ink-muted text-ink transition-colors duration-200 ease-state hover:border-ink"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-current">
-              {playing ? <path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" /> : <path d="M8 5.5v13l11-6.5z" />}
-            </svg>
-          </button>
-          <div>
-            <p className="text-label text-ink">Your voice note</p>
-            <p className="text-small text-ink-muted">{clock(value.seconds)} long. Listen back if you&apos;d like.</p>
-          </div>
+        <IconButton label={playing ? "Pause your voice note" : "Play your voice note"} ringed onClick={togglePlay}>
+          {playing ? <PauseIcon /> : <PlayIcon />}
+        </IconButton>
+        <div aria-hidden className="mx-2 h-1 min-w-0 flex-1 overflow-hidden rounded-pill bg-line">
+          <div ref={played} className="h-full origin-left scale-x-0 bg-heartwood transition-transform duration-200 ease-linear" />
         </div>
-        <Button variant="quiet" onClick={recordAgain} className="mt-2 -ml-6">
-          Record again
-        </Button>
+        <p className="text-small text-ink-muted tabular-nums">
+          <span className="sr-only">Your voice note, </span>
+          {clock(value.seconds)}
+        </p>
+        <IconButton label="Record again" onClick={recordAgain}>
+          <AgainIcon />
+        </IconButton>
       </div>
     );
   }
 
-  if (status === "recording") {
-    return (
-      <div className="rounded-lg border border-line bg-paper p-4">
-        <div ref={levels} aria-hidden className="flex h-16 items-center justify-center gap-1">
-          {Array.from({ length: bars }, (_, i) => (
-            <span
-              key={i}
-              className="level-bar h-full w-1 rounded-pill bg-heartwood"
-              style={{ "--level": 0.08 } as CSSProperties}
-            />
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-between gap-4">
-          <p className="text-label text-ink tabular-nums" role="timer" aria-label="Recording time">
-            {clock(elapsed)} <span className="font-normal text-ink-muted">of {clock(maxSeconds)}</span>
-          </p>
-          <Button onClick={stop}>Stop</Button>
-        </div>
-        {/* The last 15 seconds, counted out. Read aloud only at 15, 10 and 5, so it doesn't talk over them. */}
-        <p className="mt-2 min-h-5.5 text-small text-ink-muted">
-          {left <= countdownFrom && `${left} ${left === 1 ? "second" : "seconds"} left. Take your time finishing.`}
-        </p>
-        <p role="status" className="sr-only">
-          {left <= countdownFrom && left > 0 && left % 5 === 0 ? `${left} seconds left` : ""}
-        </p>
-      </div>
-    );
-  }
+  const recording = status === "recording";
 
   return (
-    <div className="rounded-lg border border-line bg-paper p-4">
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={start}
-          disabled={status === "asking"}
-          aria-label="Record a voice note"
-          className="inline-flex size-14 shrink-0 items-center justify-center rounded-pill border border-ink-muted text-heartwood transition-colors duration-200 ease-state hover:border-ink disabled:opacity-50"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden className="size-6 fill-current">
-            <circle cx="12" cy="12" r="7" />
-          </svg>
-        </button>
-        <div>
-          <p className="text-label text-ink">Record a voice note</p>
-          <p className="text-small text-ink-muted">
-            Up to 3 minutes. We&apos;ll ask to use your microphone when you tap record.
-          </p>
-        </div>
+    <div className="flex flex-col items-center">
+      {/* The one big button, with the growing rings round it. Record, then stop, in the same place. */}
+      <div
+        data-recording={recording ? "" : undefined}
+        className="relative grid size-34 place-items-center short:size-28"
+      >
+        <span aria-hidden className="record-ring absolute size-28 rounded-pill border-[1.5px] border-heartwood/40" />
+        <span aria-hidden className="record-ring absolute size-34 rounded-pill border-[1.5px] border-lantern/70 short:hidden" />
+        {recording ? (
+          <IconButton hero label="Stop recording" onClick={stop}>
+            <StopIcon className="size-8" />
+          </IconButton>
+        ) : (
+          <IconButton hero label="Record a voice note" onClick={start} disabled={status === "asking"}>
+            <MicIcon className="size-8" />
+          </IconButton>
+        )}
       </div>
 
-      {status === "denied" && (
-        <div className="mt-3 space-y-2">
-          <Notice>
-            We couldn&apos;t use your microphone. That&apos;s fine: you can allow it in your browser&apos;s settings
-            and try again, or write it instead.
-          </Notice>
-          <Button variant="outline" onClick={onUnavailable}>
-            Write it instead
-          </Button>
+      {recording ? (
+        <div className="mt-3 flex w-full flex-col items-center short:mt-1">
+          <div ref={levels} aria-hidden className="flex h-10 items-center justify-center gap-1 short:h-8">
+            {Array.from({ length: bars }, (_, i) => (
+              <span
+                key={i}
+                className="level-bar h-full w-1 rounded-pill bg-heartwood"
+                style={{ "--level": 0.08 } as CSSProperties}
+              />
+            ))}
+          </div>
+          <p className="mt-2 text-label text-ink tabular-nums" role="timer" aria-label="Recording time">
+            {clock(elapsed)} <span className="font-normal text-ink-muted">of {clock(maxSeconds)}</span>
+          </p>
+          {/* The last 15 seconds, counted out; until then, the idea they picked, if they picked one. */}
+          <p className="mt-1 min-h-5.5 text-center text-small text-pretty text-ink-muted">
+            {left <= countdownFrom
+              ? `${left} ${left === 1 ? "second" : "seconds"} left. Take your time finishing.`
+              : prompt}
+          </p>
+          {/* Read aloud only at 15, 10 and 5, so it doesn't talk over them. */}
+          <p role="status" className="sr-only">
+            {left <= countdownFrom && left > 0 && left % 5 === 0 ? `${left} seconds left` : ""}
+          </p>
         </div>
-      )}
-      {status === "unsupported" && (
-        <div className="mt-3 space-y-2">
-          <Notice>This browser can&apos;t record sound. You can write it instead.</Notice>
-          <Button variant="outline" onClick={onUnavailable}>
-            Write it instead
-          </Button>
+      ) : (
+        <div className="mt-2 w-full short:mt-0">
+          {status === "asking" && (
+            <p role="status" className="text-center text-small text-ink-muted">
+              Allow your microphone, and begin.
+            </p>
+          )}
+          {status === "denied" && (
+            <div className="text-center">
+              <Notice>
+                We couldn&apos;t use your microphone. That&apos;s fine: allow it in your browser&apos;s settings and
+                try again, or write instead.
+              </Notice>
+            </div>
+          )}
+          {status === "unsupported" && (
+            <div className="text-center">
+              <Notice>This browser can&apos;t record sound. You can write instead.</Notice>
+            </div>
+          )}
+          {resting}
         </div>
       )}
     </div>

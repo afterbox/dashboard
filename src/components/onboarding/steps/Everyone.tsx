@@ -12,8 +12,8 @@ import { useOnboarding } from "../OnboardingProvider";
 import { StepActions, StepFrame } from "../StepFrame";
 
 /**
- * 7. Who else? Not shown for now (`offerInOnboarding` in src/lib/onboarding.ts):
- * onboarding ends after the nudges, on the free plan.
+ * Who else? Not shown for now (`offerInOnboarding` in src/lib/onboarding.ts):
+ * onboarding ends on the free plan.
  *
  * The offer: two equal choices, and a promise that holds whichever
  * they pick. Payments aren't built, so the paid choice records interest, says

@@ -118,14 +118,14 @@ export async function saveStep(
 
     switch (step) {
       case "someone": {
-        const { name, relationship } = parsed as StepInput<"someone">;
+        const { name, relationship = null, relationshipLabel = null } = parsed as StepInput<"someone">;
         // The person this step made before, or one they already have (an account that began elsewhere).
         const existing =
           (await onboardingPerson(tx, user.id, data)) ??
           (await tx.select().from(person).where(eq(person.ownerId, user.id)).orderBy(asc(person.createdAt)).limit(1))[0];
         const saved = existing
-          ? await updatePerson(tx, user.id, existing.id, { name, relationship })
-          : await createPerson(tx, user.id, { name, relationship });
+          ? await updatePerson(tx, user.id, existing.id, { name, relationship, relationshipLabel })
+          : await createPerson(tx, user.id, { name, relationship, relationshipLabel });
         data.someone = { personId: saved.id };
         break;
       }

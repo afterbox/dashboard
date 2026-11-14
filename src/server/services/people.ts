@@ -16,11 +16,16 @@ export const toPerson = (row: Row): Person => ({
   id: row.id,
   name: row.name,
   relationship: row.relationship,
+  relationshipLabel: row.relationshipLabel,
   email: row.email,
   phone: row.phone,
   birthday: row.birthday,
   createdAt: row.createdAt.toISOString(),
 });
+
+/** Their own word for how they're related is only kept beside "someone else". */
+const ownWord = (relationship: Person["relationship"] | undefined, label: string | null | undefined) =>
+  relationship === "someone-else" ? (label ?? null) : null;
 
 /** Oldest first: the first person they thought of stays first. */
 export async function listPeople(db: Db, userId: string): Promise<Person[]> {
@@ -55,7 +60,8 @@ export async function createPerson(db: Db, userId: string, input: PersonCreate):
       .values({
         ownerId: userId,
         name: input.name,
-        relationship: input.relationship,
+        relationship: input.relationship ?? null,
+        relationshipLabel: ownWord(input.relationship, input.relationshipLabel),
         email: input.email ?? null,
         phone: input.phone ?? null,
         birthday: input.birthday ?? null,
@@ -67,7 +73,9 @@ export async function createPerson(db: Db, userId: string, input: PersonCreate):
 
 export async function updatePerson(db: Db, userId: string, personId: string, input: PersonUpdate): Promise<Person> {
   // Only what was sent: a field left out stays as it is; null clears it.
-  const changes = Object.fromEntries(Object.entries(input).filter(([, value]) => value !== undefined));
+  const changes: PersonUpdate = Object.fromEntries(Object.entries(input).filter(([, value]) => value !== undefined));
+  // Their own word goes with "someone else": choosing anything else lets it go.
+  if ("relationship" in changes && changes.relationship !== "someone-else") changes.relationshipLabel = null;
   const [row] = await db
     .update(person)
     .set({ ...changes, updatedAt: new Date() })

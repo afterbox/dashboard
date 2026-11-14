@@ -31,10 +31,18 @@
     --box: 6.5rem;
   }
 }
-/* The shortest phones (320 × 568): a little smaller, so the question and its button fit without scrolling. */
+/*
+  Shorter phones: a little smaller, so the question and what answers it fit
+  without scrolling. 375 × 667 first, then the shortest (320 × 568).
+*/
+@media (width < 48rem) and (height < 700px) {
+  .gift-box[data-size="compact"] {
+    --box: 3rem;
+  }
+}
 @media (height < 620px) {
-  .gift-box {
-    --box: 3.25rem;
+  .gift-box[data-size="compact"] {
+    --box: 2.75rem;
   }
 }
 
@@ -180,5 +188,46 @@
   }
   40% {
     opacity: 1;
+  }
+}
+
+/*
+  The next thing, arriving once the one before it is done: a line of chips
+  under a name, the envelope under a recording. A short rise and a fade.
+*/
+.reveal {
+  animation: reveal 480ms var(--ease-gift) both;
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* A single row of chips that scrolls sideways on a phone, with no bar drawn under it. */
+.chip-row {
+  scrollbar-width: none;
+}
+.chip-row::-webkit-scrollbar {
+  display: none;
+}
+
+/*
+  The rings round the record button: the growing-rings motif, still until it is
+  recording, then breathing slowly, one after the other. Scale only.
+*/
+.record-ring {
+  scale: 1;
+}
+[data-recording] > .record-ring {
+  animation: record-breathe 2400ms var(--ease-state) infinite;
+}
+[data-recording] > .record-ring:nth-child(2) {
+  animation-delay: 400ms;
+}
+@keyframes record-breathe {
+  50% {
+    scale: 1.07;
   }
 }

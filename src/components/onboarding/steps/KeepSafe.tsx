@@ -2,7 +2,7 @@
 
 import { CodeSignIn } from "@/components/app/CodeSignIn";
 import type { OnboardingState, Person } from "@/lib/schemas";
-import { stepPath } from "@/lib/onboarding";
+import { nextStep, signUpStep, stepPath } from "@/lib/onboarding";
 import { trustLines } from "@/lib/trust-lines";
 import { useOnboarding } from "../OnboardingProvider";
 import { StepActions, StepFrame } from "../StepFrame";
@@ -19,12 +19,12 @@ export function KeepSafe({ state, person }: { state: OnboardingState; person: Pe
     <StepFrame title={`Let's keep this safe for ${person.name}.`}>
       <CodeSignIn
         googleEnabled={state.googleEnabled}
-        returnTo={stepPath("reach")}
+        returnTo={stepPath(nextStep(signUpStep) ?? signUpStep)}
         onSignedIn={signedIn}
         finishLabel="Keep it safe"
         Actions={StepActions}
       >
-        <ul className="mt-6 space-y-1 text-small text-ink-muted">
+        <ul className="mt-5 space-y-1 text-small text-ink-muted short:mt-3">
           <li>{trustLines.sealed}</li>
           <li>{trustLines.data}</li>
         </ul>

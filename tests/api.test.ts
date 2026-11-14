@@ -210,7 +210,7 @@ describe("onboarding, end to end through the API", () => {
     });
 
     // A guest can't go further, or finish.
-    expect((await save("reach", {})).status).toBe(409);
+    expect((await save("find", {})).status).toBe(409);
     expect((await post(who, completeRoute.POST)).status).toBe(403);
 
     // Sign up with a code (read from the test-only hook).
@@ -221,27 +221,28 @@ describe("onboarding, end to end through the API", () => {
 
     const after = await call(who, onboardingRoute.GET);
     expect(after.data).toMatchObject({
-      currentStep: "reach",
+      currentStep: "find",
       user: { isGuest: false, email },
       person: { name: "Mary" },
       gift: { kind: "letter" },
     });
 
-    expect((await save("reach", { email: "mary@example.com" })).data.currentStep).toBe("find");
+    // Reaching them and the nudges are set aside: not steps any more.
+    expect((await save("reach", { email: "mary@example.com" })).status).toBe(409);
+    expect((await save("nudges", { reminderEmails: true })).status).toBe(409);
     const refused = await save("find", { providerName: "Monzo 12345678" });
     expect(refused.status).toBe(400);
     expect(refused.data.error.message).toMatch(/Just the name is enough/);
     expect((await save("find", { providerName: "Monzo" })).data).toMatchObject({
-      currentStep: "nudges",
+      currentStep: "find",
       bank: { providerName: "Monzo" },
     });
-    expect((await save("nudges", { reminderEmails: true })).data.currentStep).toBe("nudges");
     expect((await post(who, completeRoute.POST)).data).toMatchObject({ completed: true, planChoice: "free" });
 
     // /home's data.
     const people = (await call(who, peopleRoute.GET)).data.people;
     expect(people).toHaveLength(1);
-    expect(people[0]).toMatchObject({ name: "Mary", email: "mary@example.com" });
+    expect(people[0]).toMatchObject({ name: "Mary", email: null });
     expect((await call(who, giftsRoute.GET, { url: `/api/gifts?personId=${people[0].id}` })).data.gifts).toHaveLength(1);
     expect((await call(who, practicalRoute.GET)).data.items).toMatchObject([{ providerName: "Monzo" }]);
     expect((await call(who, planRoute.GET)).data.choice).toBe("free");

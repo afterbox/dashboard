@@ -114,7 +114,7 @@ export const rateLimit = pgTable("rate_limit", {
 // ── afterbox ────────────────────────────────────────────────────────────────
 
 /**
- * Someone they love. Name and relationship only at first; how to reach them is
+ * Someone they love. A name, and how they're related if they say; how to reach them is
  * always optional and can be added later.
  *
  * `restrict`, not `cascade`, on the owner: a person and their gifts are never
@@ -128,7 +128,10 @@ export const person = pgTable(
       .notNull()
       .references(() => user.id, { onDelete: "restrict" }),
     name: text("name").notNull(),
-    relationship: text("relationship").$type<Relationship>().notNull(),
+    /** Optional: a name is enough to begin. */
+    relationship: text("relationship").$type<Relationship>(),
+    /** Their own word for it, beside "someone-else" only. */
+    relationshipLabel: text("relationship_label"),
     email: text("email"),
     phone: text("phone"),
     birthday: date("birthday", { mode: "string" }),

@@ -3,7 +3,7 @@
 import { GiftBox } from "@/components/app/GiftBox";
 import { EnvelopeArt } from "@/components/app/GiftBoxArt";
 import type { Gift, Person } from "@/lib/schemas";
-import { giftCount, nextIdeas, relationshipLabels, type Idea } from "@/lib/words";
+import { giftCount, nextIdeas, relationshipWord, type Idea } from "@/lib/words";
 import { useUnsealed } from "@/store/gifts";
 import { stableKey } from "@/store/pending";
 
@@ -30,6 +30,9 @@ export function PersonGifts({ person, gifts, signOff, travels, onOpen }: Props) 
   const ideas = nextIdeas(person.name, person.relationship).filter(
     (idea) => !gifts.some((gift) => gift.envelopeTitle === idea.envelope),
   );
+  // "Mary, daughter", or just "Mary" when they haven't said how they're related.
+  const word = relationshipWord(person);
+  const who = word ? `${person.name}, ${word.toLowerCase()}` : person.name;
   // Something they made for this person that didn't get sealed. It is still here.
   const unsealed = useUnsealed(person.id);
 
@@ -38,7 +41,7 @@ export function PersonGifts({ person, gifts, signOff, travels, onOpen }: Props) 
       <button
         type="button"
         onClick={() => onOpen()}
-        aria-label={`${person.name}, ${relationshipLabels[person.relationship].toLowerCase()}: ${giftCount(gifts.length)}. Open ${person.name}'s gifts`}
+        aria-label={`${who}: ${giftCount(gifts.length)}. Open ${person.name}'s gifts`}
         className="justify-self-center rounded-xl"
       >
         <GiftBox name={person.name} rings={gifts.length} size="shelf" travels={travels} />

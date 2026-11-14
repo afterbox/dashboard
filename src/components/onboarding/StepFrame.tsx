@@ -8,19 +8,28 @@ type Props = {
   title: ReactNode;
   /** A line under it, where the story has one. */
   lede?: ReactNode;
+  /** An id for the question, for a field that is described by it. */
+  titleId?: string;
+  /**
+   * Where focus goes when the screen arrives. `heading` (the usual): a screen
+   * reader starts at the question, and a keyboard just above the first field.
+   * `none`: the screen puts focus somewhere itself, such as straight in its one field.
+   */
+  focus?: "heading" | "none";
   children?: ReactNode;
 };
 
 /**
  * One onboarding screen: its question, then whatever answers it. Each new one
- * moves focus to its heading, so a screen reader starts at the question and a
- * keyboard starts just above the first field.
+ * moves focus to its heading, unless the screen takes focus itself.
  */
-export function StepFrame({ title, lede, children }: Props) {
+export function StepFrame({ title, lede, titleId, focus = "heading", children }: Props) {
   const heading = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    heading.current?.focus({ preventScroll: true });
+    if (focus === "heading") heading.current?.focus({ preventScroll: true });
+    // Only as the screen arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -28,26 +37,29 @@ export function StepFrame({ title, lede, children }: Props) {
       <div className="flex flex-1 flex-col pt-2">
         <h1
           ref={heading}
+          id={titleId}
           tabIndex={-1}
-          className="font-display text-display-m-mobile text-balance text-ink outline-none md:text-display-m"
+          className="font-display text-display-m-mobile text-balance text-ink outline-none max-md:short:text-display-s-mobile md:text-display-m"
         >
           {title}
         </h1>
-        {lede && <p className="mt-3 text-body-l-mobile text-pretty text-ink-muted md:text-body-l">{lede}</p>}
-        <div className="mt-6 flex flex-1 flex-col">{children}</div>
+        {lede && <p className="mt-2 text-body-l-mobile text-pretty text-ink-muted md:mt-3 md:text-body-l">{lede}</p>}
+        <div className="mt-6 flex flex-1 flex-col short:mt-3">{children}</div>
       </div>
     </StepSlide>
   );
 }
 
 /**
- * Where a screen's buttons sit. On a phone: pinned to the bottom edge, full
- * width, clear of the home indicator, and still there when the screen is
- * longer than the phone. From a tablet up: under the question, in the column.
+ * Where a screen's buttons sit. On a phone: full width at the bottom of the
+ * screen, clear of the home indicator. They are part of the page, not laid
+ * over it: if a screen ever grows longer than the phone (a long letter), the
+ * button follows what was written, and nothing is ever covered. From a tablet
+ * up: under the question, in the column.
  */
 export function StepActions({ children }: { children: ReactNode }) {
   return (
-    <div className="sticky bottom-0 z-10 -mx-5 mt-auto bg-linen px-5 pt-6 pb-2 short:pt-3 md:static md:mx-0 md:mt-0 md:px-0 md:pt-10 md:pb-6">
+    <div className="mt-auto pt-4 pb-2 short:pt-3 md:mt-0 md:pt-10 md:pb-6">
       <div className="space-y-1">{children}</div>
     </div>
   );

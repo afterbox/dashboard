@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { EnvelopeArt } from "@/components/app/GiftBoxArt";
-import { MessageComposer, resumeComposing, startComposing, toDraft } from "@/components/app/MessageComposer";
+import { MessageComposer, readyToSeal, resumeComposing, startComposing, toDraft } from "@/components/app/MessageComposer";
 import { Button, Notice, Sheet } from "@/components/app/ui";
 import { api, errorMessage, type Draft } from "@/lib/api-client";
 import type { Gift, Person } from "@/lib/schemas";
@@ -281,9 +281,14 @@ function Compose({ person, making, onBack, onSeal }: ComposeProps) {
       <MessageComposer personName={person.name} value={composing} onChange={setComposing} />
       <div className="mt-6 space-y-1">
         <Notice>{error}</Notice>
-        <Button full onClick={seal}>
-          Seal it for {person.name}
-        </Button>
+        {/* Once there is something to seal. */}
+        {readyToSeal(composing) && (
+          <div className="reveal">
+            <Button full onClick={seal}>
+              Seal it for {person.name}
+            </Button>
+          </div>
+        )}
         <div className="flex justify-center">
           <Button variant="quiet" onClick={onBack}>
             Not now

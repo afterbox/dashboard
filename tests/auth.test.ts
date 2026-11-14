@@ -339,7 +339,7 @@ describe("a guest becomes an account", () => {
     expect(state).toMatchObject({
       user: { isGuest: false, email },
       // Signed up, so they are past the sign-up screen.
-      currentStep: "reach",
+      currentStep: "find",
       person: { name: "Mary", relationship: "daughter" },
       gift: { kind: "voice", envelopeTitle: "For Mary, on a hard day", durationSeconds: 41 },
       preference: { theme: "dark", reminderEmails: false },
@@ -350,7 +350,8 @@ describe("a guest becomes an account", () => {
     expect(sealed.storagePath).toBe(recording);
 
     // They can carry straight on.
-    expect((await saveStep(db, fakeStore(), account, "reach", {})).currentStep).toBe("find");
+    expect((await saveStep(db, fakeStore(), account, "find", {})).currentStep).toBe("find");
+    expect((await completeOnboarding(db, account)).completed).toBe(true);
   });
 
   it("joins an account that already exists, and never drops anything because of the plan", async () => {
@@ -366,9 +367,7 @@ describe("a guest becomes an account", () => {
     const store = fakeStore();
     await saveStep(db, store, account, "someone", { name: "Tom", relationship: "son" });
     await saveStep(db, store, account, "message", { kind: "letter", envelopeTitle: "For Tom", letterText: "Hello." });
-    await saveStep(db, store, account, "reach", {});
     await saveStep(db, store, account, "find", {});
-    await saveStep(db, store, account, "nudges", { reminderEmails: true });
     await completeOnboarding(db, account);
     await updatePreference(db, accountId, { theme: "light" });
 
@@ -403,7 +402,7 @@ describe("a guest becomes an account", () => {
     await moveGuestData(db, guest.id, account.id);
 
     const state = await getOnboardingState(db, account, false);
-    expect(state.currentStep).toBe("reach");
+    expect(state.currentStep).toBe("find");
     expect(state.person).toMatchObject({ name: "Mary" });
     expect(state.gift).toMatchObject({ kind: "voice" });
   });
